@@ -7,6 +7,9 @@ from utils.system_profiler import SystemProfiler
 
 class ThinTrust(Logger):
     def __init__(self):
+        if os.get_uid() != 0:
+            print('Please run as root.')
+            exit(1)
         self.config = json.load(open('config.json')) if os.path.exists('config.json') else None
         if not self.config:
             print('Config file not found. Please create a config.json file.')

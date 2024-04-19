@@ -36,6 +36,34 @@ class InitialSetup(ThinTrust):
             self.logger.error('No 32GB disk found.')
             return {'error': 'No 32GB disk found'}
         return True
+    
+    def setup_overlayroot(self):
+        self.logger.info('Setting up overlayroot...')
+        try:
+            subprocess.check_output('sudo apt-get install -y overlayroot', shell=True)
+            subprocess.check_output('sudo overlayroot-chroot', shell=True)
+            self.logger.info('Overlayroot installation completed.')
+            with open('/etc/default/grub', 'r') as f:
+                lines = f.readlines()
+            with open('/etc/default/grub', 'w') as f:
+                for i, line in enumerate(lines):
+                    if 'GRUB_CMDLINE_LINUX_DEFAULT' in line:
+                        if 'overlayroot=tmpfs' not in line:
+                            line = line.rstrip() + ' overlayroot=tmpfs"'
+                        if 'quiet' not in line:
+                            line = line.rstrip() + ' quiet"'
+                        if 'splash' not in line:
+                            line = line.rstrip() + ' splash"'
+                        if 'loglevel=3' not in line:
+                            line = line.rstrip() + ' loglevel=3"'
+                        lines[i] = line + '\n'
+                if not any('GRUB_CMDLINE_LINUX_DEFAULT' in line for line in lines):
+                    lines.append('GRUB_CMDLINE_LINUX_DEFAULT="quiet splash loglevel=3 overlayroot=tmpfs"\n')
+                f.writelines(lines)
+            subprocess.check_output('sudo update-grub', shell=True)
+            self.logger.info('Overlayroot setup completed. GRUB updated.')
+        except Exception as e:
+            self.logger.error(f'Error setting up overlayroot: {e}')
         
 if __name__ == '__main__':
     InitialSetup()

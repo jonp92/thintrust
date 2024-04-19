@@ -15,7 +15,7 @@ class ThinTrust(Logger):
         super().__init__('ThinTrust', self.log_file, self.log_level)
         self.logger.info('ThinTrust initialized.')
         self.system_profile = self.system_profile()
-        self.logger.info(f'System profile: {self.system_profile}')
+        self.logger.info(f'System profile: {self.system_profile['bios']}')
         
         
     def system_profile(self):
@@ -28,7 +28,6 @@ class ThinTrust(Logger):
     def get_bios_info(self):
         try:
             bios_info = subprocess.check_output('sudo dmidecode -t bios', shell=True).decode('utf-8').strip()
-            bios_info = bios_info.find('Vendor') + bios_info.find('Version') + bios_info.find('Release Date')
         except Exception as e:
             self.logger.error(f'Error getting BIOS info: {e}')
             return None

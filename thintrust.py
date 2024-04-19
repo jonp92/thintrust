@@ -16,6 +16,4 @@ class ThinTrust(Logger):
         super().__init__('ThinTrust', self.log_file, self.log_level)
         self.logger.info('ThinTrust initialized.')
         self.system_profiler = SystemProfiler(self.logger).system_profile
-        self.logger.info('System profile collected.')
-        
-        ''
+        self.logger.info(f"System profile: {self.system_profiler}")

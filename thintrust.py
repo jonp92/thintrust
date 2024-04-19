@@ -61,15 +61,19 @@ class ThinTrust(Logger):
             if memory.total < 1024 ** 2:
                 # if less than 1MB, show in KB
                 human_readable_values = [round(getattr(memory, attr) / 1024, 2) for attr in human_readable]
+                human_readable_values.append('KB')
             elif memory.total < 1024 ** 3:
                 # if less than 1GB, show in MB
-                human_readable_values = [round(getattr(memory, attr) / (1024 ** 2), 2) for attr in human_readable]
+                human_readable_values = [round(getattr(memory, attr) / (1024 ** 2), 2) + "MB" for attr in human_readable]
+                human_readable_values.append('MB')
             elif memory.total < 1024 ** 4:
                 # if less than 1TB, show in GB
                 human_readable_values = [round(getattr(memory, attr) / (1024 ** 3), 2) for attr in human_readable]
+                human_readable_values.append('GB')
             else:
                 # if more than 1TB, show in TB
                 human_readable_values = [round(getattr(memory, attr) / (1024 ** 4), 2) for attr in human_readable]
+                human_readable_values.append('TB')
             return dict(zip(human_readable, human_readable_values))
         except Exception as e:
             self.logger.error(f'Error getting system memory: {e}')

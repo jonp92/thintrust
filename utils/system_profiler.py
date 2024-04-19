@@ -76,6 +76,7 @@ class SystemProfiler:
                 disk_info['fstype'] = disk.fstype
                 disk_info['opts'] = disk.opts
                 disk_info['usage'] = psutil.disk_usage(disk.mountpoint)
+                disk_info['size'] = disk_info['usage'].total
                 disks.append(disk_info)
             return disks
         except Exception as e:

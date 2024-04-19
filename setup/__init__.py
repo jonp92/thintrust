@@ -1,0 +1,1 @@
+# I am here to allow setup to be imported as a module / package

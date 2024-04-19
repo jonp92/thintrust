@@ -40,7 +40,10 @@ class InitialSetup(ThinTrust):
     def setup_overlayroot(self):
         self.logger.info('Setting up overlayroot...')
         try:
-            subprocess.check_output('sudo apt-get install -y overlayroot', shell=True)
+            result = subprocess.check_output('sudo apt-get install -y overlayroot', shell=True)
+            if 'overlayroot is already the newest version' in result.decode('utf-8'):
+                self.logger.info('Overlayroot already installed.')
+                return
             subprocess.check_output('sudo overlayroot-chroot', shell=True)
             self.logger.info('Overlayroot installation completed.')
             with open('/etc/default/grub', 'r') as f:

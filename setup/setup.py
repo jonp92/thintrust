@@ -15,13 +15,17 @@ class InitialSetup(ThinTrust):
         if not self.setup_configuration:
             print('Setup file not found. Please create a setup.json file.')
             exit(1)
-        self.sanity_check()
+        sanity = self.sanity_check()
+        if sanity is not True:
+            self.logger.error(f"Sanity check failed: {sanity['error']}")
+            exit(1)
+        
     
     def sanity_check(self):
         supported_cpus = ['x86_64']
         if self.system_profiler['cpu']['architecture'] not in supported_cpus:
             self.logger.error(f'Unsupported CPU architecture: {self.system_profiler["cpu"]["architecture"]}')
-            return False
+            return {'error': 'Unsupported CPU architecture'}
         else:
             self.logger.info(f'CPU architecture Supported: {self.system_profiler["cpu"]["architecture"]}')
         return True

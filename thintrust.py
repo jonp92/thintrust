@@ -57,12 +57,10 @@ class ThinTrust(Logger):
     def get_system_memory(self):
         try:
             memory = psutil.virtual_memory()
+            human_readable = ['total', 'available', 'used', 'free']
             # convert to GB
-            memory.total = memory.total / (1024 ** 3)
-            memory.available = memory.available / (1024 ** 3)
-            memory.used = memory.used / (1024 ** 3)
-            memory.free = memory.free / (1024 ** 3)
-            return {'total': memory.total, 'available': memory.available, 'used': memory.used, 'free': memory.free}
+            human_readable_values = [round(getattr(memory, attr) / (1024 ** 3), 2) for attr in human_readable]
+            return dict(zip(human_readable, human_readable_values))
         except Exception as e:
             self.logger.error(f'Error getting system memory: {e}')
             return None

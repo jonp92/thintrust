@@ -17,6 +17,7 @@ class ThinTrust(Logger):
         self.system_profile = self.system_profile()
         self.logger.info(f"System CPU: {self.system_profile['cpu']}")
         self.logger.info(f"System BIOS:\n{self.system_profile['bios']}")
+        self.logger.info(f"System Memory:\n{self.system_profile['memory']}")
         
         
     def system_profile(self):
@@ -24,6 +25,7 @@ class ThinTrust(Logger):
         profile = {}
         profile['cpu'] = self.get_cpu_info()
         profile['bios'] = self.get_bios_info()
+        profile['memory'] = self.get_system_memory()
         return profile
         
     def get_bios_info(self):
@@ -50,4 +52,12 @@ class ThinTrust(Logger):
             return {'architecture': architecture, 'vendor': vendor, 'model': model, 'cores': cores, 'threads': threads}
         except Exception as e:
             self.logger.error(f'Error getting CPU info: {e}')
+            return None
+        
+    def get_system_memory(self):
+        try:
+            memory = psutil.virtual_memory()
+            return {'total': memory.total, 'available': memory.available, 'used': memory.used, 'free': memory.free}
+        except Exception as e:
+            self.logger.error(f'Error getting system memory: {e}')
             return None

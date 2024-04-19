@@ -57,6 +57,16 @@ class ThinTrust(Logger):
     def get_system_memory(self):
         try:
             memory = psutil.virtual_memory()
+            if memory.total > 1024**3:
+                memory.total = f'{memory.total/1024**3:.2f} GB'
+                memory.available = f'{memory.available/1024**3:.2f} GB'
+                memory.used = f'{memory.used/1024**3:.2f} GB'
+                memory.free = f'{memory.free/1024**3:.2f} GB'
+            else:
+                memory.total = f'{memory.total/1024**2:.2f} MB'
+                memory.available = f'{memory.available/1024**2:.2f} MB'
+                memory.used = f'{memory.used/1024**2:.2f} MB'
+                memory.free = f'{memory.free/1024**2:.2f} MB'
             return {'total': memory.total, 'available': memory.available, 'used': memory.used, 'free': memory.free}
         except Exception as e:
             self.logger.error(f'Error getting system memory: {e}')

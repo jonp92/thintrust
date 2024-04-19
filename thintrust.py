@@ -58,7 +58,7 @@ class ThinTrust(Logger):
         try:
             memory = psutil.virtual_memory()
             if not human_readable:
-                return memory
+                return [memory.total, memory.available, memory.used, memory.free]
             else:
                 human_readable = ['total', 'available', 'used', 'free']
                 if memory.total < 1024 ** 2:

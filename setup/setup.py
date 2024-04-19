@@ -31,6 +31,7 @@ class InitialSetup(ThinTrust):
             self.logger.error('No disks found.')
             return {'error': 'No disks found'}
         disk_sizes = [disk['size'] for disk in self.system_profiler['disks']]
+        self.logger.info(f'Disk sizes: {disk_sizes}')
         if 32 not in disk_sizes:
             self.logger.error('No 32GB disk found.')
             return {'error': 'No 32GB disk found'}

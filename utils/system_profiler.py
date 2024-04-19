@@ -78,6 +78,7 @@ class SystemProfiler:
                 disk_info['usage'] = psutil.disk_usage(disk.mountpoint)
                 disk_info['size'] = disk_info['usage'].total
                 disks.append(disk_info)
+            self.logger.info(f'Disks: {disks}')
             return disks
         except Exception as e:
             self.logger.error(f'Error getting disk info: {e}')

@@ -1,4 +1,5 @@
 {
     "log_level": "DEBUG",
-    "log_file": "thintrust.log"
+    "log_file": "thintrust.log",
+    "min_disk_space": 25
 }

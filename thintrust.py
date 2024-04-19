@@ -15,7 +15,8 @@ class ThinTrust(Logger):
         super().__init__('ThinTrust', self.log_file, self.log_level)
         self.logger.info('ThinTrust initialized.')
         self.system_profile = self.system_profile()
-        self.logger.info(f"System profile: {self.system_profile['cpu']}")
+        self.logger.info(f"System CPU: {self.system_profile['cpu']}")
+        self.logger.info(f"System BIOS: {self.system_profile['bios']}")
         
         
     def system_profile(self):

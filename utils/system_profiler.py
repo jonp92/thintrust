@@ -1,6 +1,6 @@
 import subprocess
 import psutil
-import os
+import socket
 
 class SystemProfiler:
     def __init__(self, logger=None):
@@ -10,6 +10,7 @@ class SystemProfiler:
     def system_profile(self):
         self.logger.info('Collecting system profile...')
         profile = {}
+        profile['hostname'] = socket.gethostname()
         profile['cpu'] = self.get_cpu_info()
         profile['bios'] = self.get_bios_info()
         profile['memory'] = self.get_system_memory()

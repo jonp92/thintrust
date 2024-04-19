@@ -22,6 +22,8 @@ class InitialSetup(ThinTrust):
         if self.system_profiler['cpu']['architecture'] not in supported_cpus:
             self.logger.error(f'Unsupported CPU architecture: {self.system_profiler["cpu"]["architecture"]}')
             return False
+        else:
+            self.logger.info(f'CPU architecture Supported: {self.system_profiler["cpu"]["architecture"]}')
         return True
         
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
 {
     "log_level": "DEBUG",
     "log_file": "thintrust.log",
-    "min_disk_space": 25
+    "min_disk_space": 25,
+    "distro_version": 1,
+    "distro_release": "annapolis"
 }

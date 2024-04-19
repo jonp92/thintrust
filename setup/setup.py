@@ -19,6 +19,7 @@ class InitialSetup(ThinTrust):
         if sanity is not True:
             self.logger.error(f"Sanity check failed: {sanity['error']}")
             exit(1)
+        self.setup_overlayroot()
     
     def sanity_check(self):
         supported_cpus = ['x86_64']

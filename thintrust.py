@@ -23,6 +23,7 @@ class ThinTrust(Logger):
         profile = {}
         profile['cpu'] = self.get_cpu_info()
         profile['bios'] = self.get_bios_info()
+        return profile
         
     def get_bios_info(self):
         try:

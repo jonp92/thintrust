@@ -29,7 +29,7 @@ class ThinTrust(Logger):
     def get_bios_info(self):
         try:
             bios_info = subprocess.check_output('sudo dmidecode -t bios', shell=True).decode('utf-8').strip()
-            vendor = bios_info.split('BIOS Information')
+            vendor = bios_info.split('BIOS Information')[0]
         except Exception as e:
             self.logger.error(f'Error getting BIOS info: {e}')
             return None

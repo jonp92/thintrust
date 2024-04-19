@@ -13,6 +13,7 @@ class SystemProfiler:
         profile['cpu'] = self.get_cpu_info()
         profile['bios'] = self.get_bios_info()
         profile['memory'] = self.get_system_memory()
+        profile['disks'] = self.get_disks()
         return profile
         
     def get_bios_info(self):
@@ -63,4 +64,20 @@ class SystemProfiler:
                 return dict(zip(human_readable, human_readable_values))
         except Exception as e:
             self.logger.error(f'Error getting system memory: {e}')
+            return None
+        
+    def get_disks(self):
+        try:
+            disks = []
+            for disk in psutil.disk_partitions():
+                disk_info = {}
+                disk_info['device'] = disk.device
+                disk_info['mountpoint'] = disk.mountpoint
+                disk_info['fstype'] = disk.fstype
+                disk_info['opts'] = disk.opts
+                disk_info['usage'] = psutil.disk_usage(disk.mountpoint)
+                disks.append(disk_info)
+            return disks
+        except Exception as e:
+            self.logger.error(f'Error getting disk info: {e}')
             return None

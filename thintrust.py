@@ -67,6 +67,7 @@ class ThinTrust(Logger):
                 memory.available = f'{memory.available/1024**2:.2f} MB'
                 memory.used = f'{memory.used/1024**2:.2f} MB'
                 memory.free = f'{memory.free/1024**2:.2f} MB'
+            self.logger.info(f"System Memory: {memory}")
             return {'total': memory.total, 'available': memory.available, 'used': memory.used, 'free': memory.free}
         except Exception as e:
             self.logger.error(f'Error getting system memory: {e}')

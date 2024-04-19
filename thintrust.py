@@ -58,11 +58,15 @@ class ThinTrust(Logger):
         try:
             memory = psutil.virtual_memory()
             human_readable = ['total', 'available', 'used', 'free']
-            # convert to GB
+            # if less than 1GB, show in MB
             if memory.total < 1024 ** 3:
-                human_readable_values = [attr for attr in human_readable]
-            else:
+                human_readable_values = [round(getattr(memory, attr) / (1024 ** 2), 2) for attr in human_readable]
+            elif memory.total < 1024 ** 4:
+                # if less than 1TB, show in GB
                 human_readable_values = [round(getattr(memory, attr) / (1024 ** 3), 2) for attr in human_readable]
+            else:
+                # if less than 1GB, don't alter
+                human_readable_values = [getattr(memory, attr) for attr in human_readable]
             return dict(zip(human_readable, human_readable_values))
         except Exception as e:
             self.logger.error(f'Error getting system memory: {e}')

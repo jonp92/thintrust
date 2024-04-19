@@ -42,11 +42,12 @@ class ThinTrust(Logger):
     def get_cpu_info(self):
         try:
             verbose_info = subprocess.check_output('lscpu', shell=True).decode('utf-8').strip()
+            architecture = verbose_info.split('Architecture:')[1].split('\n')[0].strip()
             vendor = verbose_info.split('Vendor ID:')[1].split('\n')[0].strip()
             model = verbose_info.split('Model name:')[1].split('\n')[0].strip()
             cores = verbose_info.split('CPU(s):')[1].split('\n')[0].strip()
             threads = verbose_info.split('Thread(s) per core:')[1].split('\n')[0].strip()
-            return {'vendor': vendor, 'model': model, 'cores': cores, 'threads': threads}
+            return {'architecture': architecture, 'vendor': vendor, 'model': model, 'cores': cores, 'threads': threads}
         except Exception as e:
             self.logger.error(f'Error getting CPU info: {e}')
             return None

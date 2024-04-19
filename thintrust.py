@@ -29,11 +29,12 @@ class ThinTrust(Logger):
     def get_bios_info(self):
         try:
             bios_info = subprocess.check_output('sudo dmidecode -t bios', shell=True).decode('utf-8').split('BIOS Information')[1].strip()
-            vendor = bios_info.split('Vendor: ')[1].split('\n')[0].strip()
-            version = bios_info.split('Version: ')[1].split('\n')[0].strip()
-            release_date = bios_info.split('Release Date: ')[1].split('\n')[0].strip()
-            is_virtual = bios_info.find('System is a virtual machine') != -1
-            return vendor, version, release_date, is_virtual
+            bios = {}
+            bios['vendor'] = bios_info.split('Vendor: ')[1].split('\n')[0].strip()
+            bios['version'] = bios_info.split('Version: ')[1].split('\n')[0].strip()
+            bios['release_date'] = bios_info.split('Release Date: ')[1].split('\n')[0].strip()
+            bios['is_virtual'] = bios_info.find('System is a virtual machine') != -1
+            return bios
         except Exception as e:
             self.logger.error(f'Error getting BIOS info: {e}')
             return None

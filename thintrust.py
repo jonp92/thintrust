@@ -54,23 +54,26 @@ class ThinTrust(Logger):
             self.logger.error(f'Error getting CPU info: {e}')
             return None
         
-    def get_system_memory(self):
+    def get_system_memory(self, human_readable=False):
         try:
             memory = psutil.virtual_memory()
-            human_readable = ['total', 'available', 'used', 'free']
-            if memory.total < 1024 ** 2:
-                # if less than 1MB, show in KB
-                human_readable_values = [str(round(getattr(memory, attr) / 1024, 2)) + " KB" for attr in human_readable]
-            elif memory.total < 1024 ** 3:
-                # if less than 1GB, show in MB
-                human_readable_values = [str(round(getattr(memory, attr) / (1024 ** 2), 2)) + " MB" for attr in human_readable]
-            elif memory.total < 1024 ** 4:
-                # if less than 1TB, show in GB
-                human_readable_values = [str(round(getattr(memory, attr) / (1024 ** 3), 2)) + " GB" for attr in human_readable]
+            if not human_readable:
+                return memory
             else:
-                # if more than 1TB, show in TB
-                human_readable_values = [str(round(getattr(memory, attr) / (1024 ** 4), 2)) + " TB" for attr in human_readable]
-            return dict(zip(human_readable, human_readable_values))
+                human_readable = ['total', 'available', 'used', 'free']
+                if memory.total < 1024 ** 2:
+                    # if less than 1MB, show in KB
+                    human_readable_values = [str(round(getattr(memory, attr) / 1024, 2)) + " KB" for attr in human_readable]
+                elif memory.total < 1024 ** 3:
+                    # if less than 1GB, show in MB
+                    human_readable_values = [str(round(getattr(memory, attr) / (1024 ** 2), 2)) + " MB" for attr in human_readable]
+                elif memory.total < 1024 ** 4:
+                    # if less than 1TB, show in GB
+                    human_readable_values = [str(round(getattr(memory, attr) / (1024 ** 3), 2)) + " GB" for attr in human_readable]
+                else:
+                    # if more than 1TB, show in TB
+                    human_readable_values = [str(round(getattr(memory, attr) / (1024 ** 4), 2)) + " TB" for attr in human_readable]
+                return dict(zip(human_readable, human_readable_values))
         except Exception as e:
             self.logger.error(f'Error getting system memory: {e}')
             return None

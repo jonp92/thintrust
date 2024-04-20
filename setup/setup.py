@@ -4,7 +4,7 @@ import json
 import subprocess
 import requests
 from thintrust import ThinTrust
-from utils.sevenzip import SevenZip
+#from utils.sevenzip import SevenZip
 
 class InitialSetup(ThinTrust):
     def __init__(self):

@@ -50,7 +50,7 @@
         }
     },
     "rebrand_os_packages": [
-        "figlet, p7zip, cinnamon-desktop-environment, plymouth"
+        "figlet", "p7zip", "cinnamon-desktop-environment", "plymouth"
     ],
     "splash_theme_url": "https://thintrust.com/"
 }

@@ -59,8 +59,10 @@ class InitialSetup(ThinTrust):
         self.logger.info('Rebranding OS...')
         def install_rebrand_packages(self):
             try:
-                packages = ' '.join(self.setup_config['rebrand_os_packages']).split(',') # join the list of packages with a space for apt
-                subprocess.check_output(f'sudo apt install -y {packages}', shell=True) # install the packages with apt
+                packages = self.setup_config['rebrand_os_packages']
+                self.logger.debug(f'Installing rebrand packages: {packages}')
+                for package in packages:
+                    subprocess.check_output(f'sudo apt install -y {package}', shell=True)
                 return True
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')

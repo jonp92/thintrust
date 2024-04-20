@@ -226,7 +226,7 @@ class InitialSetup(ThinTrust):
             try:
                 os.chmod('/usr/share/wallpapers/wallpaper.svg', 0o644)
                 subprocess.check_output('.venv/bin/pip3 install PyGObject', shell=True)
-                subprocess.check_output('cp set_theme.py /usr/local/etc/', shell=True)
+                subprocess.check_output('cp setup/set_theme.py /usr/local/etc/', shell=True)
                 with open('/home/user/.config/autostart/set_theme.desktop', 'w') as f:
                     f.write('[Desktop Entry]\n'
                             'Type=Application\n'

@@ -160,15 +160,15 @@ class InitialSetup(ThinTrust):
                             if 'loglevel=3' not in line:
                                 line += ' loglevel=3'
                             line += '"'  # Add a single closing quote at the end
-                        lines[i] = line + '\n'
                         if 'GRUB_DISTRIBUTOR' in line:
-                            lines[i] = 'GRUB_DISTRIBUTOR="ThinTrust"\n' # change GRUB_DISTRIBUTOR to ThinTrust
+                            line = 'GRUB_DISTRIBUTOR="ThinTrust"'
                         if 'GRUB_TIMEOUT' in line:
-                            lines[i] = 'GRUB_TIMEOUT=2\n'
+                            line = 'GRUB_TIMEOUT=2'
                         if 'GRUB_BACKGROUND' in line:
-                            lines[i] = 'GRUB_BACKGROUND="/boot/grub/thintrust.png"\n'
+                            line = 'GRUB_BACKGROUND="/boot/grub/thintrust.png"'
+                        lines[i] = line if line.endswith('\n') else line + '\n'
                     if not any('GRUB_DISTRIBUTOR' in line for line in lines):
-                            lines.append('GRUB_DISTRIBUTOR="ThinTrust"\n')
+                        lines.append('GRUB_DISTRIBUTOR="ThinTrust"\n')
                     if not any('GRUB_CMDLINE_LINUX_DEFAULT' in line for line in lines):
                         lines.append('GRUB_CMDLINE_LINUX_DEFAULT="quiet splash loglevel=3 overlayroot=tmpfs"\n')
                     if not any('GRUB_TIMEOUT' in line for line in lines):

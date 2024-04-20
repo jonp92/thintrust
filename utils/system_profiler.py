@@ -18,7 +18,7 @@ class SystemProfiler:
         
     def get_bios_info(self):
         try:
-            bios_info = subprocess.check_output('sudo dmidecode -t bios', shell=True).decode('utf-8').split('BIOS Information')[1].strip()
+            bios_info = subprocess.check_output('dmidecode -t bios', shell=True).decode('utf-8').split('BIOS Information')[1].strip()
             bios = {}
             bios['vendor'] = bios_info.split('Vendor: ')[1].split('\n')[0].strip()
             bios['version'] = bios_info.split('Version: ')[1].split('\n')[0].strip()

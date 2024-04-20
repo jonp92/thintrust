@@ -11,7 +11,6 @@ class InitialSetup(ThinTrust):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         setup_file = f'{script_dir}/setup.json'
         super().__init__()
-        print(self.distro_version)
         self.logger.name = 'InitialSetup'
         self.logger.info('Starting initial setup...')
         self.sevenzip = SevenZip()
@@ -71,9 +70,9 @@ class InitialSetup(ThinTrust):
         def change_issue(self):
             try:
                 with open('/etc/issue', 'w') as f:
-                    f.write(f"ThinTrust GNU/Linux {self.disto_version} \n \l")
+                    f.write(f"ThinTrust GNU/Linux {self.distro_version} \n \l")
                 with open('/etc/issue.net', 'w') as f:
-                    f.write(f"ThinTrust GNU/Linux {self.disto_version}")
+                    f.write(f"ThinTrust GNU/Linux {self.distro_version}")
                 return True
             except Exception as e:
                 self.logger.error(f'Error changing issue files: {e}')

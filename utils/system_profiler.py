@@ -1,5 +1,4 @@
 import subprocess
-import psutil
 import socket
 
 class SystemProfiler:
@@ -44,6 +43,7 @@ class SystemProfiler:
             return None
         
     def get_system_memory(self, human_readable=False):
+        import psutil
         try:
             memory = psutil.virtual_memory()
             if not human_readable:
@@ -68,6 +68,7 @@ class SystemProfiler:
             return None
         
     def get_disks(self):
+        import psutil
         try:
             disks = []
             for disk in psutil.disk_partitions():

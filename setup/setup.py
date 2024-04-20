@@ -3,7 +3,7 @@ import sys
 import json
 import shutil
 import subprocess
-import requests
+
 from thintrust import ThinTrust
 #from utils.sevenzip import SevenZip
 
@@ -123,6 +123,7 @@ class InitialSetup(ThinTrust):
                 return False
 
         def change_splash(self):
+            import requests
             try:
                 if os.path.exists('/usr/share/plymouth/themes/thintrust'):
                     shutil.rmtree('/usr/share/plymouth/themes/thintrust')
@@ -142,6 +143,7 @@ class InitialSetup(ThinTrust):
                 return False
             
         def update_grub(self):
+            import requests
             try:
                 with open('/boot/grub/thintrust.png', 'wb') as f:
                     f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/resources/wallpapers/wallpapernologo.png').content)
@@ -183,6 +185,7 @@ class InitialSetup(ThinTrust):
                 return False
             
         def set_default_background(self):
+            import requests
             if not os.path.exists('/usr/share/wallpapers'):
                 os.makedirs('/usr/share/wallpapers')
             with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:

@@ -122,10 +122,11 @@ class InitialSetup(ThinTrust):
             try:
                 os.makedirs('/usr/share/plymouth/themes/thintrust', exist_ok=True)
                 with open('plymouththeme.7z', 'wb') as f:
-                    self.logger.debug(f'Fetching splash screen from https://thintrust.com/release/{self.distro_release}/plymouththeme.7z')
+                    self.logger.debug(f'Fetching theme from https://thintrust.com/release/{self.distro_release}/plymouththeme.7z')
                     f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/plymouththeme.7z').content)
+                self.logger.debug('Theme downloaded, decompressing...')
                 subprocess.check_output('7z x plymouththeme.7z -o/etc/usr/plymouth/themes', shell=True)
-                self.logger.debug('decompressed theme')
+                self.logger.debug('Decompressed theme')
                 subprocess.check_output('plymouth-set-default-theme -R thintrust', shell=True)
                 return True
             except Exception as e:

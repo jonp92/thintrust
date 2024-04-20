@@ -145,11 +145,28 @@ class InitialSetup(ThinTrust):
             
         def update_grub(self):
             import requests
+            blkid = subprocess.check_output('blkid -s UUID -o value /dev/sda2', shell=True).decode('utf-8').strip()
             try:
                 with open('/boot/grub/thintrust.png', 'wb') as f:
                     f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpapernologo.png').content)
                 with open('/etc/grub.d/40_custom', 'w') as f:
-                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/40_custom').text)
+                    f.write(f'''#!/bin/sh
+                            exec tail -n +3 $0
+                            # This file provides an easy way to add custom menu entries.  Simply type the
+                            # menu entries you want to add after this comment.  Be careful not to change
+                            # the 'exec tail' line above.
+                            menuentry 'ThinTrust GNU/Linux Read-Write Mode' --class debian --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-simple-f7bbee7d-1d0d-4ddd-a8dd->
+                                    load_video
+                                    insmod gzio
+                                    if [ x$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi
+                                    insmod part_gpt
+                                    insmod ext2
+                                    search --no-floppy --fs-uuid --set=root {blkid}
+                                    echo    'Loading Linux {os.uname().release} ...'
+                                    linux   /boot/vmlinuz-{os.uname().release} root=UUID={blkid} rw quiet splash loglevel=3
+                                    echo    'Loading initial ramdisk ...'
+                                    initrd  /boot/initrd.img-{os.uname().release}
+                        }}''')
                 os.chmod('/etc/grub.d/40_custom', 0o755)
                 with open('/etc/default/grub', 'r') as f:
                     lines = f.readlines()

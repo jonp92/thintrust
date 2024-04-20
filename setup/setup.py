@@ -141,13 +141,13 @@ class InitialSetup(ThinTrust):
                     for i, line in enumerate(lines):
                         if 'GRUB_CMDLINE_LINUX_DEFAULT' in line:
                             if 'overlayroot=tmpfs' not in line:
-                                line = line.rstrip() + ' overlayroot=tmpfs"'
+                                line = line.rstrip() + ' overlayroot=tmpfs'
                             if 'quiet' not in line:
-                                line = line.rstrip() + ' quiet"'
+                                line = line.rstrip() + ' quiet'
                             if 'splash' not in line:
-                                line = line.rstrip() + ' splash"'
+                                line = line.rstrip() + ' splash'
                             if 'loglevel=3' not in line:
-                                line = line.rstrip() + ' loglevel=3"'
+                                line = line.rstrip() + ' loglevel=3'
                             lines[i] = line + '\n'
                         if 'GRUB_DISTRIBUTOR' in line:
                             lines[i] = 'GRUB_DISTRIBUTOR="ThinTrust"\n' # change GRUB_DISTRIBUTOR to ThinTrust

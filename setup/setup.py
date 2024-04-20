@@ -146,7 +146,7 @@ class InitialSetup(ThinTrust):
             import requests
             try:
                 with open('/boot/grub/thintrust.png', 'wb') as f:
-                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/resources/wallpapers/wallpapernologo.png').content)
+                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpapernologo.png').content)
                 with open('/etc/default/grub', 'r') as f:
                     lines = f.readlines()
                 with open('/etc/default/grub', 'w') as f:
@@ -189,7 +189,7 @@ class InitialSetup(ThinTrust):
             if not os.path.exists('/usr/share/wallpapers'):
                 os.makedirs('/usr/share/wallpapers')
             with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
-                f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/resources/wallpapers/wallpaper.png').content)
+                f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpaper.png').content)
             try:
                 subprocess.check_output('.venv/bin/pip3 install PyGObject', shell=True)
                 import gi

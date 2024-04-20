@@ -204,6 +204,18 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error updating GRUB: {e}')
                 return False
+        
+        def ensure_user(self):
+            try:
+                if subprocess.check_output('id user', shell=True):
+                    return True
+                else:
+                    subprocess.check_output('useradd -m -s /bin/bash user', shell=True)
+                    subprocess.check_output('echo "user:user" | chpasswd', shell=True)
+                    return True
+            except Exception as e:
+                self.logger.error(f'Error creating user: {e}')
+                return False
             
         def set_default_background(self):
             import requests
@@ -214,23 +226,18 @@ class InitialSetup(ThinTrust):
             try:
                 os.chmod('/usr/share/wallpapers/wallpaper.svg', 0o644)
                 subprocess.check_output('.venv/bin/pip3 install PyGObject', shell=True)
-                import gi
-                gi.require_version('Gio', '2.0')
-                from gi.repository import Gio
-            except Exception as e:
-                self.logger.error(f'Error importing PyGObject: {e}')
-                return False
-            try:
-                gsettings_bg = Gio.Settings.new('org.cinnamon.desktop.background')
-                gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpapers/wallpaper.svg')
-                gsettings_bg.apply()
-                gsettings_interface = Gio.Settings.new('org.cinnamon.desktop.interface')
-                gsettings_interface.set_string('gtk-theme', 'Adwaita-dark')
-                gsettings_interface.set_string('icon-theme', 'Papirus-Dark')
-                gsettings_interface.set_string('cursor-theme', 'mate-black')
-                gsettings_theme = Gio.Settings.new('org.cinnamon.theme')
-                gsettings_theme.set_string('name', 'BlueMenta')
-                return True
+                subprocess.check_output('cp set_theme.py /usr/local/etc/', shell=True)
+                with open('/home/user/.config/autostart/set_theme.desktop', 'w') as f:
+                    f.write('[Desktop Entry]\n'
+                            'Type=Application\n'
+                            'Name=Set Theme\n'
+                            'Comment=Set the default theme\n'
+                            'Comment[en_US]=Set the default theme\n'
+                            'Exec=/usr/bin/python3 /usr/local/etc/set_theme.py\n'
+                            'X-GNOME-Autostart-enabled=true\n'
+                            'StartupNotify=false\n'
+                            'Terminal=false\n'
+                            'Hidden=false\n')
             except Exception as e:
                 self.logger.error(f'Error setting default background: {e}')
                 return False

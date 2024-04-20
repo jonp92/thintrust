@@ -188,9 +188,10 @@ class InitialSetup(ThinTrust):
             import requests
             if not os.path.exists('/usr/share/wallpapers'):
                 os.makedirs('/usr/share/wallpapers')
-            with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
-                f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpaper.png').content)
+            with open('/usr/share/wallpapers/wallpaper.svg', 'wb') as f:
+                f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpaper.svg').content)
             try:
+                os.chmod('/usr/share/wallpapers/wallpaper.svg', 0o644)
                 subprocess.check_output('.venv/bin/pip3 install PyGObject', shell=True)
                 import gi
                 gi.require_version('Gio', '2.0')
@@ -200,20 +201,24 @@ class InitialSetup(ThinTrust):
                 return False
             try:
                 gsettings_bg = Gio.Settings.new('org.cinnamon.desktop.background')
-                gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpaper/wallpaper.png')
+                gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpaper/wallpaper.svg')
                 gsettings_interface = Gio.Settings.new('org.cinnamon.desktop.interface')
                 gsettings_interface.set_string('gtk-theme', 'Adwaita-dark')
                 gsettings_interface.set_string('icon-theme', 'Papirus-Dark')
                 gsettings_interface.set_string('cursor-theme', 'mate-black')
                 gsettings_theme = Gio.Settings.new('org.cinnamon.theme')
-                gsettings_theme.set_string('name', 'cinnamon')
+                gsettings_theme.set_string('name', 'BlueMenta')
                 return True
             except Exception as e:
                 self.logger.error(f'Error setting default background: {e}')
                 return False
             
         def set_lightdm_theme(self):
+            import requests
             try:
+                with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
+                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpaper.png').content)
+                os.chmod('/usr/share/wallpapers/wallpaper.png', 0o644)
                 if not os.path.exists('/etc/lightdm/lightdm-gtk-greeter.conf.d'):
                     os.makedirs('/etc/lightdm/lightdm-gtk-greeter.conf.d')
                 elif os.path.exists('/etc/lightdm/lightdm-gtk-greeter.conf.d/01_debian.conf'):

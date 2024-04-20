@@ -62,6 +62,7 @@ class InitialSetup(ThinTrust):
                 packages = self.setup_config['rebrand_os_packages']
                 self.logger.debug(f'Installing rebrand packages: {packages}')
                 for package in packages:
+                    self.logger.debug(f'Installing {package}...')
                     subprocess.check_output(f'sudo apt install -y {package}', shell=True)
                 return True
             except Exception as e:

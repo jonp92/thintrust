@@ -176,9 +176,14 @@ class InitialSetup(ThinTrust):
                 os.makedirs('/usr/share/wallpapers')
             with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
                 f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/wallpaper.png').content)
-            import gi
-            gi.require_version('Gio', '2.0')
-            from gi.repository import Gio
+            try:
+                subprocess.check_output('.venv/bin/pip3 install PyGObject', shell=True)
+                import gi
+                gi.require_version('Gio', '2.0')
+                from gi.repository import Gio
+            except Exception as e:
+                self.logger.error(f'Error importing PyGObject: {e}')
+                return False
             gsettings_bg = Gio.Settings.new('org.cinnamon.desktop.background')
             gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpaper/wallpaper.png')
             gsettings_interface = Gio.Settings.new('org.cinnamon.desktop.interface')

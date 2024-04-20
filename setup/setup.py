@@ -148,6 +148,9 @@ class InitialSetup(ThinTrust):
             try:
                 with open('/boot/grub/thintrust.png', 'wb') as f:
                     f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpapernologo.png').content)
+                with open('/etc/grub.d/40_custom', 'w') as f:
+                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/40_custom').text)
+                os.chmod('/etc/grub.d/40_custom', 0o755)
                 with open('/etc/default/grub', 'r') as f:
                     lines = f.readlines()
                 with open('/etc/default/grub', 'w') as f:

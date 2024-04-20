@@ -15,9 +15,11 @@ class InitialSetup(ThinTrust):
         self.logger.name = 'InitialSetup'
         self.logger.info('Starting initial setup...')
         self.sevenzip = SevenZip()
-        self.setup_config = json.load(open(setup_file)) if os.path.exists(setup_file) else None
-        if not self.setup_config:
-            print('Setup file not found. Please create a setup.json file.')
+        if os.path.exists(setup_file):
+            with open(setup_file, 'r') as f:
+                self.setup_config = json.load(f)
+        else:
+            self.logger.error('Setup file not found.')
             exit(1)
         sanity = self.sanity_check()
         if sanity is not True:

@@ -155,7 +155,7 @@ class InitialSetup(ThinTrust):
                         "# This file provides an easy way to add custom menu entries.  Simply type the\n"
                         "# menu entries you want to add after this comment.  Be careful not to change\n"
                         "# the 'exec tail' line above.\n"
-                        "menuentry 'ThinTrust GNU/Linux Read-Write Mode' --class debian --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-simple-f7bbee7d-1d0d-4ddd-a8dd->\n"
+                        f"menuentry 'ThinTrust GNU/Linux Read-Write Mode' --class debian --class gnu-linux --class gnu --class os $menuentry_id_option 'gnulinux-simple-{blkid}' {{\n"
                         "    load_video\n"
                         "    insmod gzio\n"
                         "    if [ x$grub_platform = xxen ]; then insmod xzio; insmod lzopio; fi\n"

@@ -173,7 +173,7 @@ class InitialSetup(ThinTrust):
                 self.logger.error(f'Error updating GRUB: {e}')
                 return False
         def set_default_background(self):
-            with open('/usr/share/wallpaper/wallpaper.png', 'wb') as f:
+            with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
                 f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/wallpaper.png').content)
             import gi
             gi.require_version('Gio', '2.0')

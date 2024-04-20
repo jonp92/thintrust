@@ -26,7 +26,7 @@ class ThinTrust(Logger):
         self.logger.info('Installing initial packages...')
         try:
             subprocess.check_output(f'apt-get update -y', shell=True)
-            subprocess.check_output(f'apt-get install -y {' '.join(self.initial_packages)}', shell=True)
+            subprocess.check_output(f'apt-get install -y {" ".join(self.initial_packages)}', shell=True)
             subprocess.check_output('python3 -m venv .venv', shell=True)
             subprocess.check_output('.venv/bin/pip3 install -r requirements.txt', shell=True) 
             return True

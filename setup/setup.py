@@ -5,7 +5,7 @@ import shutil
 import subprocess
 
 from thintrust import ThinTrust
-#from utils.sevenzip import SevenZip
+from utils.sevenzip import SevenZip
 
 class InitialSetup(ThinTrust):
     def __init__(self):
@@ -14,7 +14,7 @@ class InitialSetup(ThinTrust):
         super().__init__()
         self.logger.name = 'InitialSetup'
         self.logger.info('Starting initial setup...')
-        #self.sevenzip = SevenZip()
+        self.sevenzip = SevenZip()
         self.setup_config = json.load(open(setup_file)) if os.path.exists(setup_file) else None
         if not self.setup_config:
             print('Setup file not found. Please create a setup.json file.')
@@ -41,7 +41,6 @@ class InitialSetup(ThinTrust):
         if not any(size >= self.min_disk_space for size in disk_sizes):
             self.logger.error('No 32GB disk found.')
             return {'error': 'No 32GB disk found'}
-
         return True
     
     def setup_overlayroot(self):
@@ -135,7 +134,7 @@ class InitialSetup(ThinTrust):
                         self.logger.debug(f'Fetching theme from https://thintrust.com/release/{self.distro_release}/resources/plymouththeme.7z')
                         f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/plymouththeme.7z').content)
                     self.logger.debug('Theme downloaded, decompressing...')
-                subprocess.check_output('7z x plymouththeme.7z -o/usr/share/plymouth/themes', shell=True)
+                self.sevenzip.decompress('plymouththeme.7z', '/usr/share/plymouth/themes/thintrust')
                 self.logger.info('Decompressed theme, please wait as it is set as the default theme)')
                 self.logger.debug('Decompressed theme, setting as default theme (Note: This may take a few seconds as it regenerates the initramfs)')
                 subprocess.check_output('plymouth-set-default-theme -R thintrust', shell=True)

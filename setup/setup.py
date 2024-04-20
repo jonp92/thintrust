@@ -121,10 +121,8 @@ class InitialSetup(ThinTrust):
         def change_splash(self):
             try:
                 os.makedirs('/usr/share/plymouth/themes/thintrust', exist_ok=True)
-                with requests.get(f'https://thintrust.com/release/{self.distro_version}/plymouthsplash.7z', stream=True) as r:
-                    with open('plymouthsplash.7z', 'wb') as f:
-                        for chunk in r.iter_content(chunk_size=8192):
-                            f.write(chunk)
+                with open('plymouthsplash.7z', 'wb') as f:
+                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/plymouthsplash.7z').content)
                 self.sevenzip.decompress('plymouthsplash.7z', '/usr/share/plymouth/themes/thintrust')
                 subprocess.check_output('plymouth-set-default-theme -R thintrust', shell=True)
                 return True

@@ -81,15 +81,15 @@ class InitialSetup(ThinTrust):
         def change_os_release(self):
             try:
                 with open('/etc/os-release', 'w') as f:
-                    f.write('''PRETTY_NAME="ThinTrust GNU/Linux 1 (Annapolis)"
-                            NAME="ThinTrust GNU/Linux"
-                            VERSION_ID="1"
-                            VERSION="1 (Annapolis)"
-                            VERSION_CODENAME=annapolis
-                            ID=thintrust
-                            HOME_URL="https://thintrust.com/"
-                            SUPPORT_URL="https://thintrust.com/support"
-                            BUG_REPORT_URL="https://bugs.thintrust.com/"''')
+                    f.write('PRETTY_NAME="ThinTrust GNU/Linux 1 (Annapolis)"\n'
+                            'NAME="ThinTrust GNU/Linux"\n'
+                            'VERSION_ID="1"\n'
+                            'VERSION="1 (Annapolis)"\n'
+                            'VERSION_CODENAME=annapolis\n'
+                            'ID=thintrust\n'
+                            'HOME_URL="https://thintrust.com/"\n'
+                            'SUPPORT_URL="https://thintrust.com/support"\n'
+                            'BUG_REPORT_URL="https://bugs.thintrust.com/"')
                 return True
             except Exception as e:
                 self.logger.error(f'Error changing os-release file: {e}')
@@ -98,10 +98,10 @@ class InitialSetup(ThinTrust):
         def change_lsb_release(self):
             try:
                 with open('/etc/lsb-release', 'w') as f:
-                    f.write('''DISTRIB_ID=ThinTrust
-                            DISTRIB_RELEASE=1
-                            DISTRIB_CODENAME=annapolis
-                            DISTRIB_DESCRIPTION="ThinTrust GNU/Linux 1 (Annapolis)"''')
+                    f.write('DISTRIB_ID=ThinTrust\n'
+                            'DISTRIB_RELEASE=1\n'
+                            'DISTRIB_CODENAME=annapolis\n'
+                            'DISTRIB_DESCRIPTION="ThinTrust GNU/Linux 1 (Annapolis)"')
                 return True
             except Exception as e:
                 self.logger.error(f'Error changing lsb-release file: {e}')
@@ -112,11 +112,11 @@ class InitialSetup(ThinTrust):
                 with open('/etc/motd', 'w') as f:
                     f.write('') # clear the motd file as we will use update-motd.d to generate it dynamically
                 with open('/etc/update-motd.d/15-thintrust', 'w') as f:
-                    f.write(f'''#!/bin/sh
-                            figlet ThinTrust    # figlet is a program that creates ASCII art text
-                            echo "Welcome to ThinTrust GNU/Linux 1 (Annapolis)"
-                            echo "For support visit https://thintrust.com/support"
-                            echo "Hostname: $(hostname), IP: $(hostname -I | awk '{{print $1}}')"''') # {{}} is used to escape the curly braces in f-strings
+                    f.write('#!/bin/sh\n'
+                            'figlet ThinTrust\n'    # figlet is a program that creates ASCII art text
+                            'echo "Welcome to ThinTrust GNU/Linux 1 (Annapolis)"\n'
+                            'echo "For support visit https://thintrust.com/support"\n'
+                            'echo "Hostname: $(hostname), IP: $(hostname -I | awk \'{print $1}\')"') # {{}} is used to escape the curly braces in f-strings
                 return True
             except Exception as e:
                 self.logger.error(f'Error changing motd file: {e}')
@@ -129,8 +129,8 @@ class InitialSetup(ThinTrust):
                 os.makedirs('/usr/share/plymouth/themes/thintrust')
                 if not os.path.exists('plymouththeme.7z'):
                     with open('plymouththeme.7z', 'wb') as f:
-                        self.logger.debug(f'Fetching theme from https://thintrust.com/release/{self.distro_release}/plymouththeme.7z')
-                        f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/plymouththeme.7z').content)
+                        self.logger.debug(f'Fetching theme from https://thintrust.com/release/{self.distro_release}/resources/plymouththeme.7z')
+                        f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/plymouththeme.7z').content)
                     self.logger.debug('Theme downloaded, decompressing...')
                 subprocess.check_output('7z x plymouththeme.7z -o/usr/share/plymouth/themes', shell=True)
                 self.logger.info('Decompressed theme, please wait as it is set as the default theme)')
@@ -144,7 +144,7 @@ class InitialSetup(ThinTrust):
         def update_grub(self):
             try:
                 with open('/boot/grub/thintrust.png', 'wb') as f:
-                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/grub.png').content)
+                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/resources/wallpapers/wallpapernologo.png').content)
                 with open('/etc/default/grub', 'r') as f:
                     lines = f.readlines()
                 with open('/etc/default/grub', 'w') as f:
@@ -186,7 +186,7 @@ class InitialSetup(ThinTrust):
             if not os.path.exists('/usr/share/wallpapers'):
                 os.makedirs('/usr/share/wallpapers')
             with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
-                f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/wallpaper.png').content)
+                f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/resources/wallpapers/wallpaper.png').content)
             try:
                 subprocess.check_output('.venv/bin/pip3 install PyGObject', shell=True)
                 import gi
@@ -211,27 +211,19 @@ class InitialSetup(ThinTrust):
             
         def set_lightdm_theme(self):
             try:
-                with open('/usr/share/lightdm/lightdm-gtk-greater.conf', 'r') as f:
-                    lines = f.readlines()
-                with open('/usr/share/lightdm/lightdm-gtk-greater.conf', 'w') as f:
-                    for i, line in enumerate(lines):
-                        if 'background=' in line:
-                            lines[i] = f'background=/usr/share/wallpaper/wallpaper.png\n'
-                        if 'theme-name=' in line:
-                            lines[i] = f'theme-name=Adwaita-dark\n'
-                        if 'icon-theme-name=' in line:
-                            lines[i] = f'icon-theme-name=Papirus-Dark\n'
-                        if 'cursor-theme-name=' in line:
-                            lines[i] = f'cursor-theme-name=mate-black\n'
-                    if not any('background=' in line for line in lines):
-                        lines.append('background=/usr/share/wallpaper/wallpaper.png\n')
-                    if not any('theme-name=' in line for line in lines):
-                        lines.append('theme-name=Adwaita-dark\n')
-                    if not any('icon-theme-name=' in line for line in lines):
-                        lines.append('icon-theme-name=Papirus-Dark\n')
-                    if not any('cursor-theme-name=' in line for line in lines):
-                        lines.append('cursor-theme-name=mate-black\n')
-                    f.writelines(lines)
+                if not os.path.exists('/usr/share/lightdm/lightdm-gtk-greater.conf.d'):
+                    os.makedirs('/usr/share/lightdm/lightdm-gtk-greater.conf.d')
+                elif os.path.exists('/usr/share/lightdm/lightdm-gtk-greater.conf.d/01_debian.conf'):
+                    os.remove('/usr/share/lightdm/lightdm-gtk-greater.conf.d/01_debian.conf')
+                with open('/usr/share/lightdm/lightdm-gtk-greater.conf.d/01_thintrust.conf', 'w') as f:
+                    f.write('[greeter]\n'
+                            'background=/usr/share/wallpapers/wallpaper.png\n'
+                            'theme-name=Adwaita-dark\n'
+                            'icon-theme-name=Papirus-Dark\n'
+                            'xft-antialias=true\n'
+                            'xft-hintstyle=hintfull\n'
+                            'xft-rgba=rgb\n'
+                            'reader=orca')
                 return True
             except Exception as e:
                 self.logger.error(f'Error setting lightdm theme: {e}')

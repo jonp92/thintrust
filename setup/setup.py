@@ -134,7 +134,7 @@ class InitialSetup(ThinTrust):
                         self.logger.debug(f'Fetching theme from https://thintrust.com/release/{self.distro_release}/resources/plymouththeme.7z')
                         f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/plymouththeme.7z').content)
                     self.logger.debug('Theme downloaded, decompressing...')
-                self.sevenzip.decompress('plymouththeme.7z', '/usr/share/plymouth/themes/thintrust')
+                self.sevenzip.decompress('plymouththeme.7z', '/usr/share/plymouth/themes/')
                 self.logger.info('Decompressed theme, please wait as it is set as the default theme)')
                 self.logger.debug('Decompressed theme, setting as default theme (Note: This may take a few seconds as it regenerates the initramfs)')
                 subprocess.check_output('plymouth-set-default-theme -R thintrust', shell=True)

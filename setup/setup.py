@@ -141,15 +141,17 @@ class InitialSetup(ThinTrust):
                 with open('/etc/default/grub', 'w') as f:
                     for i, line in enumerate(lines):
                         if 'GRUB_CMDLINE_LINUX_DEFAULT' in line:
+                            line = line.rstrip().rstrip('"')  # Strip newline and trailing quote
                             if 'overlayroot=tmpfs' not in line:
-                                line = line.rstrip() + ' overlayroot=tmpfs'
+                                line += ' overlayroot=tmpfs'
                             if 'quiet' not in line:
-                                line = line.rstrip() + ' quiet'
+                                line += ' quiet'
                             if 'splash' not in line:
-                                line = line.rstrip() + ' splash'
+                                line += ' splash'
                             if 'loglevel=3' not in line:
-                                line = line.rstrip() + ' loglevel=3'
-                            lines[i] = line + '\n'
+                                line += ' loglevel=3'
+                            line += '"'  # Add a single closing quote at the end
+                        lines[i] = line + '\n'
                         if 'GRUB_DISTRIBUTOR' in line:
                             lines[i] = 'GRUB_DISTRIBUTOR="ThinTrust"\n' # change GRUB_DISTRIBUTOR to ThinTrust
                         if 'GRUB_TIMEOUT' in line:

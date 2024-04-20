@@ -47,7 +47,7 @@ class InitialSetup(ThinTrust):
     def setup_overlayroot(self):
         self.logger.info('Setting up overlayroot...')
         try:
-            result = subprocess.check_output('apt install -y overlayroot', shell=True)
+            result = subprocess.check_output('apt-get install -y overlayroot', shell=True)
             if 'overlayroot is already the newest version' in result.decode('utf-8'):
                 self.logger.info('Overlayroot already installed, skipping...')
                 return
@@ -62,7 +62,7 @@ class InitialSetup(ThinTrust):
             try:
                 packages = self.setup_config['rebrand_os_packages']
                 self.logger.debug(f'Installing rebrand packages: {packages}')
-                subprocess.check_output(f'apt install -y {" ".join(packages)}', shell=True)
+                subprocess.check_output(f'apt-get install -y {" ".join(packages)}', shell=True)
                 return True
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')

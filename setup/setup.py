@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import shutil
 import subprocess
 import requests
 from thintrust import ThinTrust
@@ -46,11 +47,11 @@ class InitialSetup(ThinTrust):
     def setup_overlayroot(self):
         self.logger.info('Setting up overlayroot...')
         try:
-            result = subprocess.check_output('sudo apt-get install -y overlayroot', shell=True)
+            result = subprocess.check_output('apt install -y overlayroot', shell=True)
             if 'overlayroot is already the newest version' in result.decode('utf-8'):
                 self.logger.info('Overlayroot already installed, skipping...')
                 return
-            subprocess.check_output('sudo overlayroot-chroot', shell=True)
+            subprocess.check_output('overlayroot-chroot', shell=True)
             self.logger.info('Overlayroot installation completed.')
         except Exception as e:
             self.logger.error(f'Error setting up overlayroot: {e}')
@@ -61,7 +62,7 @@ class InitialSetup(ThinTrust):
             try:
                 packages = self.setup_config['rebrand_os_packages']
                 self.logger.debug(f'Installing rebrand packages: {packages}')
-                subprocess.check_output(f'sudo apt-get install -y {" ".join(packages)}', shell=True)
+                subprocess.check_output(f'apt install -y {" ".join(packages)}', shell=True)
                 return True
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')
@@ -76,6 +77,7 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error changing issue files: {e}')
                 return False
+            
         def change_os_release(self):
             try:
                 with open('/etc/os-release', 'w') as f:
@@ -92,6 +94,7 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error changing os-release file: {e}')
                 return False
+            
         def change_lsb_release(self):
             try:
                 with open('/etc/lsb-release', 'w') as f:
@@ -103,6 +106,7 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error changing lsb-release file: {e}')
                 return False
+            
         def change_motd(self):
             try:
                 with open('/etc/motd', 'w') as f:
@@ -117,13 +121,17 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error changing motd file: {e}')
                 return False
+
         def change_splash(self):
             try:
-                os.makedirs('/usr/share/plymouth/themes/thintrust', exist_ok=True)
-                with open('plymouththeme.7z', 'wb') as f:
-                    self.logger.debug(f'Fetching theme from https://thintrust.com/release/{self.distro_release}/plymouththeme.7z')
-                    f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/plymouththeme.7z').content)
-                self.logger.debug('Theme downloaded, decompressing...')
+                if os.path.exists('/usr/share/plymouth/themes/thintrust'):
+                    shutil.rmtree('/usr/share/plymouth/themes/thintrust')
+                os.makedirs('/usr/share/plymouth/themes/thintrust')
+                if not os.path.exists('plymouththeme.7z'):
+                    with open('plymouththeme.7z', 'wb') as f:
+                        self.logger.debug(f'Fetching theme from https://thintrust.com/release/{self.distro_release}/plymouththeme.7z')
+                        f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/plymouththeme.7z').content)
+                    self.logger.debug('Theme downloaded, decompressing...')
                 subprocess.check_output('7z x plymouththeme.7z -o/usr/share/plymouth/themes', shell=True)
                 self.logger.debug('Decompressed theme')
                 subprocess.check_output('plymouth-set-default-theme -R thintrust', shell=True)
@@ -131,6 +139,7 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error changing splash screen: {e}')
                 return False
+            
         def update_grub(self):
             try:
                 with open('/boot/grub/thintrust.png', 'wb') as f:
@@ -166,11 +175,12 @@ class InitialSetup(ThinTrust):
                     if not any('GRUB_BACKGROUND' in line for line in lines):
                         lines.append('GRUB_BACKGROUND="/boot/grub/thintrust.png"\n')
                     f.writelines(lines)
-                subprocess.check_output('sudo update-grub', shell=True)
+                subprocess.check_output('update-grub', shell=True)
                 return True
             except Exception as e:
                 self.logger.error(f'Error updating GRUB: {e}')
                 return False
+            
         def set_default_background(self):
             if not os.path.exists('/usr/share/wallpapers'):
                 os.makedirs('/usr/share/wallpapers')
@@ -192,6 +202,7 @@ class InitialSetup(ThinTrust):
             gsettings_interface.set_string('cursor-theme', 'mate-black')
             gsettings_theme = Gio.Settings.new('org.cinnamon.theme')
             gsettings_theme.set_string('name', 'cinnamon')
+            
         def set_lightdm_theme(self):
             try:
                 with open('/usr/share/lightdm/lightdm-gtk-greater.conf', 'r') as f:
@@ -219,6 +230,7 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error setting lightdm theme: {e}')
                 return False
+            
         if not install_rebrand_packages(self):
             self.logger.error('Error installing rebrand packages.')
             return {'step': 'install_rebrand_packages', 'status': 'failed'}

@@ -61,7 +61,7 @@ class InitialSetup(ThinTrust):
         def install_rebrand_packages(self):
             try:
                 packages = self.setup_config['rebrand_os_packages']
-                sudoaptinstall.install(package_list=packages)
+                sudoaptinstall.sudo_apt_install(packages)
                 self.logger.debug(f'Installing rebrand packages: {packages}')
                 return True
             except Exception as e:

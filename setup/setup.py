@@ -211,11 +211,11 @@ class InitialSetup(ThinTrust):
             
         def set_lightdm_theme(self):
             try:
-                if not os.path.exists('/usr/share/lightdm/lightdm-gtk-greater.conf.d'):
-                    os.makedirs('/usr/share/lightdm/lightdm-gtk-greater.conf.d')
-                elif os.path.exists('/usr/share/lightdm/lightdm-gtk-greater.conf.d/01_debian.conf'):
-                    os.remove('/usr/share/lightdm/lightdm-gtk-greater.conf.d/01_debian.conf')
-                with open('/usr/share/lightdm/lightdm-gtk-greater.conf.d/01_thintrust.conf', 'w') as f:
+                if not os.path.exists('/etc/lightdm/lightdm-gtk-greater.conf.d'):
+                    os.makedirs('/etc/lightdm/lightdm-gtk-greater.conf.d')
+                elif os.path.exists('/etc/lightdm/lightdm-gtk-greater.conf.d/01_debian.conf'):
+                    os.remove('/etc/lightdm/lightdm-gtk-greater.conf.d/01_debian.conf')
+                with open('/etc/lightdm/lightdm-gtk-greater.conf.d/01_thintrust.conf', 'w') as f:
                     f.write('[greeter]\n'
                             'background=/usr/share/wallpapers/wallpaper.png\n'
                             'theme-name=Adwaita-dark\n'

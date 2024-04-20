@@ -117,6 +117,8 @@ class InitialSetup(ThinTrust):
                             'echo "Welcome to ThinTrust GNU/Linux 1 (Annapolis)"\n'
                             'echo "For support visit https://thintrust.com/support"\n'
                             'echo "Hostname: $(hostname), IP: $(hostname -I | awk \'{print $1}\')"') # {{}} is used to escape the curly braces in f-strings
+                os.chmod('/etc/update-motd.d/15-thintrust', 0o755)
+                subprocess.check_output('run-parts /etc/update-motd.d/ > /var/run/motd.dynamic', shell=True)
                 return True
             except Exception as e:
                 self.logger.error(f'Error changing motd file: {e}')

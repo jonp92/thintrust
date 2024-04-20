@@ -61,9 +61,9 @@ class InitialSetup(ThinTrust):
             try:
                 packages = self.setup_config['rebrand_os_packages']
                 self.logger.debug(f'Installing rebrand packages: {packages}')
-                for package in packages:
-                    self.logger.debug(f'Installing {package}...')
-                    os.system(f'sudo apt-get install -y {package}')
+                for i, package in enumerate(packages):
+                    self.logger.debug(f'Installing package {package} ({i + 1}/{len(packages)})')
+                    subprocess.check_output(f'sudo apt-get install -y {package}', shell=True)
                 return True
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')

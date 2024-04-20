@@ -60,9 +60,7 @@ class InitialSetup(ThinTrust):
         def install_rebrand_packages(self):
             try:
                 packages = self.setup_config['rebrand_os_packages']
-                for package in packages:
-                    self.logger.debug(f'Installing {package}...')
-                return True
+                self.logger.debug(f'Installing rebrand packages: {packages[0]}')
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')
                 return False

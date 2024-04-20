@@ -133,7 +133,8 @@ class InitialSetup(ThinTrust):
                         f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/plymouththeme.7z').content)
                     self.logger.debug('Theme downloaded, decompressing...')
                 subprocess.check_output('7z x plymouththeme.7z -o/usr/share/plymouth/themes', shell=True)
-                self.logger.debug('Decompressed theme')
+                self.logger.info('Decompressed theme, please wait as it is set as the default theme)')
+                self.logger.debug('Decompressed theme, setting as default theme (Note: This may take a few seconds as it regenerates the initramfs)')
                 subprocess.check_output('plymouth-set-default-theme -R thintrust', shell=True)
                 return True
             except Exception as e:
@@ -194,14 +195,19 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error importing PyGObject: {e}')
                 return False
-            gsettings_bg = Gio.Settings.new('org.cinnamon.desktop.background')
-            gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpaper/wallpaper.png')
-            gsettings_interface = Gio.Settings.new('org.cinnamon.desktop.interface')
-            gsettings_interface.set_string('gtk-theme', 'Adwaita-dark')
-            gsettings_interface.set_string('icon-theme', 'Papirus-Dark')
-            gsettings_interface.set_string('cursor-theme', 'mate-black')
-            gsettings_theme = Gio.Settings.new('org.cinnamon.theme')
-            gsettings_theme.set_string('name', 'cinnamon')
+            try:
+                gsettings_bg = Gio.Settings.new('org.cinnamon.desktop.background')
+                gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpaper/wallpaper.png')
+                gsettings_interface = Gio.Settings.new('org.cinnamon.desktop.interface')
+                gsettings_interface.set_string('gtk-theme', 'Adwaita-dark')
+                gsettings_interface.set_string('icon-theme', 'Papirus-Dark')
+                gsettings_interface.set_string('cursor-theme', 'mate-black')
+                gsettings_theme = Gio.Settings.new('org.cinnamon.theme')
+                gsettings_theme.set_string('name', 'cinnamon')
+                return True
+            except Exception as e:
+                self.logger.error(f'Error setting default background: {e}')
+                return False
             
         def set_lightdm_theme(self):
             try:

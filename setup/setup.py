@@ -125,6 +125,7 @@ class InitialSetup(ThinTrust):
                     self.logger.debug(f'Fetching splash screen from https://thintrust.com/release/{self.distro_release}/plymouththeme.7z')
                     f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/plymouththeme.7z').content)
                 self.sevenzip.decompress('plymouththeme.7z', '/usr/share/plymouth/themes/')
+                self.logger.debug('decompressed theme')
                 subprocess.check_output('plymouth-set-default-theme -R thintrust', shell=True)
                 return True
             except Exception as e:

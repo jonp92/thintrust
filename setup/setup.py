@@ -174,7 +174,6 @@ class InitialSetup(ThinTrust):
         def set_default_background(self):
             if not os.path.exists('/usr/share/wallpapers'):
                 os.makedirs('/usr/share/wallpapers')
-            subprocess.check_output('startx', shell=True)
             with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
                 f.write(requests.get(f'https://thintrust.com/release/{self.distro_version}/wallpaper.png').content)
             import gi

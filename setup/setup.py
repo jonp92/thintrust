@@ -202,6 +202,7 @@ class InitialSetup(ThinTrust):
             try:
                 gsettings_bg = Gio.Settings.new('org.cinnamon.desktop.background')
                 gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpaper/wallpaper.svg')
+                gsettings_bg.apply()
                 gsettings_interface = Gio.Settings.new('org.cinnamon.desktop.interface')
                 gsettings_interface.set_string('gtk-theme', 'Adwaita-dark')
                 gsettings_interface.set_string('icon-theme', 'Papirus-Dark')

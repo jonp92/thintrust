@@ -5,8 +5,6 @@ import subprocess
 import requests
 from thintrust import ThinTrust
 from utils.sevenzip import SevenZip
-import sudoaptinstall
-from getpass import getpass
 
 class InitialSetup(ThinTrust):
     def __init__(self):
@@ -61,10 +59,11 @@ class InitialSetup(ThinTrust):
         self.logger.info('Rebranding OS...')
         def install_rebrand_packages(self):
             try:
-                password = getpass('Enter your password to install rebrand packages: ')
-                packages = ['plymouth', 'figlet', 'cinnamon-desktop-environment', 'p7zip']
-                sudoaptinstall.sudo_apt_install(package_list=packages, password=password)
+                packages = self.setup_config['rebrand_os_packages']
                 self.logger.debug(f'Installing rebrand packages: {packages}')
+                for package in packages:
+                    self.logger.debug(f'Installing {package}...')
+                    os.system(f'sudo apt-get install -y {package}')
                 return True
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')

@@ -5,6 +5,7 @@ import subprocess
 import requests
 from thintrust import ThinTrust
 from utils.sevenzip import SevenZip
+import sudoaptinstall
 
 class InitialSetup(ThinTrust):
     def __init__(self):
@@ -60,9 +61,8 @@ class InitialSetup(ThinTrust):
         def install_rebrand_packages(self):
             try:
                 packages = self.setup_config['rebrand_os_packages']
+                sudoaptinstall.install(packages)
                 self.logger.debug(f'Installing rebrand packages: {packages}')
-                for package in packages:
-                    self.logger.debug(f'Installing {package}...')
                 return True
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')

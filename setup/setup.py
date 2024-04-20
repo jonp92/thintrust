@@ -287,6 +287,9 @@ class InitialSetup(ThinTrust):
         if not update_grub(self):
             self.logger.error('Error updating GRUB.')
             return {'step': 'update_grub', 'status': 'failed'}
+        if not ensure_user(self):
+            self.logger.error('Error creating user.')
+            return {'step': 'ensure_user', 'status': 'failed'}
         if not set_default_background(self):
             self.logger.error('Error setting default background.')
             return {'step': 'set_default_background', 'status': 'failed'}

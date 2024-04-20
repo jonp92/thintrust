@@ -62,7 +62,7 @@ class InitialSetup(ThinTrust):
         def install_rebrand_packages(self):
             try:
                 password = getpass('Enter your password to install rebrand packages: ')
-                packages = self.setup_config['rebrand_os_packages']
+                packages = ['plymouth', 'figlet', 'cinnamon-desktop-environment', 'p7zip']
                 sudoaptinstall.sudo_apt_install(package_list=packages, password=password)
                 self.logger.debug(f'Installing rebrand packages: {packages}')
                 return True

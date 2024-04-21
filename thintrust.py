@@ -39,7 +39,7 @@ class ThinTrust(Logger):
         for key, value in self.config.items():
             setattr(self, key, value)
         super().__init__('ThinTrust', self.log_file, self.log_level)
-        self.logger.info(f'ThinTrust initialized.\nVersion: {self.distro_version}\nRelease: {self.distro_release}\n')
+        self.logger.info(f'ThinTrust Version: {self.distro_version}\nRelease: {self.distro_release}\n')
         if not self.install_initial_packages():
             self.logger.error(f'Error installing initial packages:{self.initial_packages}\n Try installing them manually and running ThinTrust again.')
             exit(1)

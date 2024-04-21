@@ -37,7 +37,7 @@ class InitialSetup(ThinTrust):
         setup_file = f'{script_dir}/setup.json'
         super().__init__()
         self.logger.name = 'InitialSetup'
-        self.logger.info('Starting initial setup...')
+        self.logger.info(f'Starting initial setup of ThinTrust GNU/Linux {self.distro_version} {self.distro_release}...')
         self.sevenzip = SevenZip()
         if os.path.exists(setup_file):
             with open(setup_file, 'r') as f:
@@ -49,7 +49,9 @@ class InitialSetup(ThinTrust):
         if sanity is not True:
             self.logger.error(f"Sanity check failed: {sanity['error']}")
             exit(1)
-        self.setup_overlayroot()
+        if not self.setup_overlayroot():
+            self.logger.error('Error setting up overlayroot.')
+            exit(1)
         self.rebrand_os()
     
     def sanity_check(self):
@@ -64,8 +66,7 @@ class InitialSetup(ThinTrust):
         Returns:
             bool or dict: True if the sanity check passes, otherwise a dictionary with an error message.
         """
-        supported_cpus = ['x86_64']
-        if self.system_profiler['cpu']['architecture'] not in supported_cpus:
+        if self.system_profiler['cpu']['architecture'] not in self.setup_config['supported_cpus']:
             self.logger.error(f'Unsupported CPU architecture: {self.system_profiler["cpu"]["architecture"]}')
             return {'error': 'Unsupported CPU architecture'}
         else:
@@ -97,10 +98,12 @@ class InitialSetup(ThinTrust):
             result = subprocess.check_output('apt-get install -y overlayroot', shell=True)
             if 'overlayroot is already the newest version' in result.decode('utf-8'):
                 self.logger.info('Overlayroot already installed, skipping...')
-                return
+                return True
             self.logger.info('Overlayroot installation completed.')
+            return True
         except Exception as e:
             self.logger.error(f'Error setting up overlayroot: {e}')
+            return False
             
     def rebrand_os(self):
         """
@@ -136,6 +139,7 @@ class InitialSetup(ThinTrust):
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')
                 return False
+            
         def change_issue(self):
             """
             Changes the issue files.

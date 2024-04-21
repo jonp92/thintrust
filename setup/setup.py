@@ -52,7 +52,10 @@ class InitialSetup(ThinTrust):
         if not self.setup_overlayroot():
             self.logger.error('Error setting up overlayroot.')
             exit(1)
-        self.rebrand_os()
+        rebrand_status = self.rebrand_os()
+        if rebrand_status != 'success':
+            self.logger.error(f"Rebranding failed: {rebrand_status}")
+            exit(1)
     
     def sanity_check(self):
         """

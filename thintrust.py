@@ -5,7 +5,30 @@ import subprocess
 from utils.system_profiler import SystemProfiler
 
 class ThinTrust(Logger):
+    """
+    The ThinTrust class represents the main functionality of the ThinTrust application.
+
+    It initializes the ThinTrust application, checks for root privileges, loads the configuration file,
+    installs initial packages, and sets up the system profiler.
+
+    Attributes:
+        config (dict): The configuration loaded from the config.json file.
+        system_profiler (SystemProfiler): An instance of the SystemProfiler class.
+
+    Methods:
+        __init__(): Initializes the ThinTrust application.
+        install_initial_packages(): Installs the initial packages required by ThinTrust.
+
+    """
+
     def __init__(self):
+        """
+        Initializes the ThinTrust application.
+
+        Raises:
+            SystemExit: If ThinTrust is not run as root or if the config file is not found.
+
+        """
         if os.geteuid() != 0:
             print('ThinTrust must be run as root. Please run with sudo or as root.')
             exit(1)
@@ -23,6 +46,13 @@ class ThinTrust(Logger):
         self.system_profiler = SystemProfiler(self.logger).system_profile
         
     def install_initial_packages(self):
+        """
+        Installs the initial packages required by ThinTrust.
+
+        Returns:
+            bool: True if the installation is successful, False otherwise.
+
+        """
         self.logger.info('Installing initial packages...')
         try:
             subprocess.check_output(f'apt-get update -y', shell=True)

@@ -8,7 +8,32 @@ from thintrust import ThinTrust
 from utils.sevenzip import SevenZip
 
 class InitialSetup(ThinTrust):
+    """
+    Class representing the initial setup of the ThinTrust system.
+
+    Attributes:
+        setup_config (dict): Configuration data for the setup.
+        sevenzip (SevenZip): Instance of the SevenZip class for handling 7zip operations.
+
+    Methods:
+        __init__(): Initializes the InitialSetup object.
+        sanity_check(): Performs a sanity check on the system.
+        setup_overlayroot(): Sets up overlayroot on the system.
+        rebrand_os(): Rebrands the operating system.
+    """
+
     def __init__(self):
+        """
+        Initializes the InitialSetup object.
+
+        This method sets up the necessary attributes and performs the initial setup steps.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         script_dir = os.path.dirname(os.path.abspath(__file__))
         setup_file = f'{script_dir}/setup.json'
         super().__init__()
@@ -29,6 +54,17 @@ class InitialSetup(ThinTrust):
         self.rebrand_os()
     
     def sanity_check(self):
+        """
+        Performs a sanity check on the system.
+
+        This method checks if the CPU architecture and disk space meet the requirements.
+
+        Args:
+            None
+
+        Returns:
+            bool or dict: True if the sanity check passes, otherwise a dictionary with an error message.
+        """
         supported_cpus = ['x86_64']
         if self.system_profiler['cpu']['architecture'] not in supported_cpus:
             self.logger.error(f'Unsupported CPU architecture: {self.system_profiler["cpu"]["architecture"]}')
@@ -46,6 +82,17 @@ class InitialSetup(ThinTrust):
         return True
     
     def setup_overlayroot(self):
+        """
+        Sets up overlayroot on the system.
+
+        This method installs overlayroot if it is not already installed.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.logger.info('Setting up overlayroot...')
         try:
             result = subprocess.check_output('apt-get install -y overlayroot', shell=True)
@@ -58,8 +105,31 @@ class InitialSetup(ThinTrust):
             self.logger.error(f'Error setting up overlayroot: {e}')
             
     def rebrand_os(self):
+        """
+        Rebrands the operating system.
+
+        This method performs various rebranding tasks such as changing issue files, OS release file,
+        motd file, splash screen, and updating grub.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         self.logger.info('Rebranding OS...')
         def install_rebrand_packages(self):
+            """
+            Installs the rebrand packages.
+
+            This method installs the rebrand packages specified in the setup configuration.
+
+            Args:
+                None
+
+            Returns:
+                bool: True if the packages are installed successfully, False otherwise.
+            """
             try:
                 packages = self.setup_config['rebrand_os_packages']
                 self.logger.debug(f'Installing rebrand packages: {packages}')
@@ -69,6 +139,17 @@ class InitialSetup(ThinTrust):
                 self.logger.error(f'Error installing rebrand packages: {e}')
                 return False
         def change_issue(self):
+            """
+            Changes the issue files.
+
+            This method updates the /etc/issue and /etc/issue.net files with the ThinTrust branding.
+
+            Args:
+                None
+
+            Returns:
+                bool: True if the files are updated successfully, False otherwise.
+            """
             try:
                 with open('/etc/issue', 'w') as f:
                     f.write(f"ThinTrust GNU/Linux {self.distro_version} \n \l")
@@ -80,6 +161,17 @@ class InitialSetup(ThinTrust):
                 return False
             
         def change_os_release(self):
+            """
+            Changes the os-release file.
+
+            This method updates the /etc/os-release file with the ThinTrust branding.
+
+            Args:
+                None
+
+            Returns:
+                bool: True if the file is updated successfully, False otherwise.
+            """
             try:
                 with open('/etc/os-release', 'w') as f:
                     f.write('PRETTY_NAME="ThinTrust GNU/Linux 1 (Annapolis)"\n'
@@ -97,6 +189,17 @@ class InitialSetup(ThinTrust):
                 return False
             
         def change_lsb_release(self):
+            """
+            Changes the lsb-release file.
+
+            This method updates the /etc/lsb-release file with the ThinTrust branding.
+
+            Args:
+                None
+
+            Returns:
+                bool: True if the file is updated successfully, False otherwise.
+            """
             try:
                 with open('/etc/lsb-release', 'w') as f:
                     f.write('DISTRIB_ID=ThinTrust\n'
@@ -109,6 +212,17 @@ class InitialSetup(ThinTrust):
                 return False
             
         def change_motd(self):
+            """
+            Changes the motd file.
+
+            This method updates the /etc/motd file and generates a dynamic motd using update-motd.d.
+
+            Args:
+                None
+
+            Returns:
+                bool: True if the file is updated successfully, False otherwise.
+            """
             try:
                 with open('/etc/motd', 'w') as f:
                     f.write('') # clear the motd file as we will use update-motd.d to generate it dynamically
@@ -126,6 +240,17 @@ class InitialSetup(ThinTrust):
                 return False
 
         def change_splash(self):
+            """
+            Changes the splash screen.
+
+            This method downloads and sets the ThinTrust theme as the default splash screen.
+
+            Args:
+                None
+
+            Returns:
+                bool: True if the splash screen is changed successfully, False otherwise.
+            """
             import requests
             try:
                 if os.path.exists('/usr/share/plymouth/themes/thintrust'):
@@ -146,6 +271,17 @@ class InitialSetup(ThinTrust):
                 return False
             
         def update_grub(self):
+            """
+            Updates the grub configuration.
+
+            This method updates the grub configuration to include a custom menu entry for ThinTrust.
+
+            Args:
+                None
+
+            Returns:
+                bool: True if the grub configuration is updated successfully, False otherwise.
+            """
             import requests
             blkid = subprocess.check_output('blkid -s UUID -o value /dev/sda2', shell=True).decode('utf-8').strip()
             try:

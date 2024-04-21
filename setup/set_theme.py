@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+import subprocess
 
-from gi.repository import Gio
 
 def set_theme():
+    subprocess.check_output('gsettings set org.cinnamon.desktop.background picture-uri "file:///usr/share/wallpapers/wallpaper.svg"', shell=True)
     gsettings_bg = Gio.Settings.new('org.cinnamon.desktop.background')
     gsettings_bg.set_string('picture-uri', 'file:///usr/share/wallpapers/wallpaper.svg')
     gsettings_bg.apply()

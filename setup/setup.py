@@ -364,6 +364,7 @@ class InitialSetup(ThinTrust):
                 os.chmod('/usr/share/wallpapers/wallpaper.svg', 0o644)
                 subprocess.check_output('cp setup/default_theme.sh /usr/local/etc/', shell=True)
                 os.chmod('/usr/local/etc/default_theme.sh', 0o755)
+                os.chown('/usr/local/etc/default_theme.sh', 1000, 1000)
                 if not os.path.exists('/home/user/.config/autostart'):
                     os.makedirs('/home/user/.config/autostart')
                     os.chown('/home/user/.config/', 1000, 1000)

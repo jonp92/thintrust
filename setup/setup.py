@@ -37,7 +37,7 @@ class InitialSetup(ThinTrust):
         setup_file = f'{script_dir}/setup.json'
         super().__init__()
         self.logger.name = 'InitialSetup'
-        self.logger.info(f'Starting initial setup of ThinTrust GNU/Linux {self.distro_version} {self.distro_release}...')
+        self.logger.info(f'Starting initial setup of ThinTrust GNU/Linux {self.distro_version} {self.distro_release.capitalize()}...')
         self.sevenzip = SevenZip()
         if os.path.exists(setup_file):
             with open(setup_file, 'r') as f:

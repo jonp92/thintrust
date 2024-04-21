@@ -11,9 +11,9 @@ class SevenZip:
             self.path = subprocess.check_output(['which', '7z']).decode('utf-8').strip()
         except Exception as e:
             print(f'Error getting 7zip path: {e}')
+            print('Installing 7zip...')
             subprocess.check_output('apt-get install -y p7zip-full', shell=True)
             self.path = subprocess.check_output(['which', '7z']).decode('utf-8').strip()
-        self.version = self.get_version()
     
     def get_version(self):
         """

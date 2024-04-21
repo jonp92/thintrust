@@ -50,7 +50,6 @@
         }
     },
     "rebrand_os_packages": [
-        "sudo", "figlet", "p7zip", "cinnamon-desktop-environment", "plymouth", "plymouth-themes", "python3-venv", "python3-pip"
-    ],
-    "splash_theme_url": "https://thintrust.com/"
+        "sudo", "figlet", "p7zip", "cinnamon-desktop-environment", "plymouth", "plymouth-themes"
+    ]
 }

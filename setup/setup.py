@@ -98,7 +98,6 @@ class InitialSetup(ThinTrust):
             if 'overlayroot is already the newest version' in result.decode('utf-8'):
                 self.logger.info('Overlayroot already installed, skipping...')
                 return
-            subprocess.check_output('overlayroot-chroot', shell=True)
             self.logger.info('Overlayroot installation completed.')
         except Exception as e:
             self.logger.error(f'Error setting up overlayroot: {e}')

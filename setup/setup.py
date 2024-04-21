@@ -363,8 +363,7 @@ class InitialSetup(ThinTrust):
                 f.write(requests.get(f'https://thintrust.com/release/{self.distro_release}/resources/wallpapers/wallpaper.svg').content)
             try:
                 os.chmod('/usr/share/wallpapers/wallpaper.svg', 0o644)
-                subprocess.check_output('.venv/bin/pip3 install PyGObject', shell=True)
-                subprocess.check_output('cp setup/set_theme.py /usr/local/etc/', shell=True)
+                subprocess.check_output('cp setup/default_theme.sh /usr/local/etc/', shell=True)
                 if not os.path.exists('/home/user/.config/autostart'):
                     os.makedirs('/home/user/.config/autostart')
                 with open('/home/user/.config/autostart/set_theme.desktop', 'w') as f:
@@ -373,11 +372,12 @@ class InitialSetup(ThinTrust):
                             'Name=Set Theme\n'
                             'Comment=Set the default theme\n'
                             'Comment[en_US]=Set the default theme\n'
-                            'Exec=/usr/bin/python3 /usr/local/etc/set_theme.py\n'
+                            'Exec=/usr/local/etc/default_theme.sh\n'
                             'X-GNOME-Autostart-enabled=true\n'
                             'StartupNotify=false\n'
                             'Terminal=false\n'
                             'Hidden=false\n')
+                return True
             except Exception as e:
                 self.logger.error(f'Error setting default background: {e}')
                 return False

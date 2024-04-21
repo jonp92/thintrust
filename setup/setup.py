@@ -366,6 +366,7 @@ class InitialSetup(ThinTrust):
                 os.chmod('/usr/local/etc/default_theme.sh', 0o755)
                 if not os.path.exists('/home/user/.config/autostart'):
                     os.makedirs('/home/user/.config/autostart')
+                    os.chown('/home/user/.config/autostart', 1000, 1000)
                 with open('/home/user/.config/autostart/set_theme.desktop', 'w') as f:
                     f.write('[Desktop Entry]\n'
                             'Type=Application\n'

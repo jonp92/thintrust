@@ -75,7 +75,7 @@ if __name__ == '__main__':
     parser.epilog = 'ThinTrust is a tool for setting up and managing ThinTrust OS endpoints.\n'
     args = parser.parse_args()
     if args.version:
-        print(f'ThinTrust Release: {thintrust.pretty_version}')
+        print(f'ThinTrust {thintrust.pretty_version}')
     elif args.setup:
         thintrust.install_initial_packages()
         thintrust.initial_setup(thintrust)

@@ -97,8 +97,11 @@ if __name__ == '__main__':
         print(f'ThinTrust {thintrust.pretty_version}')
     elif args.setup:
         # First, install the initial packages required by ThinTrust as some are required by initial setup. Then, run the initial setup.
-        thintrust.install_initial_packages()
-        thintrust.initial_setup.run()
+        if input('This will configure Debian for the ThinTrust Endpoint. Continue? (y/n): ').lower() == 'y':
+            thintrust.install_initial_packages()
+            thintrust.initial_setup.run()
+        else:
+            print('Invalid selection. Exiting...')
     elif args.sysprofile:
         print(json.dumps(thintrust.system_profiler, indent=4))
     else:

@@ -54,6 +54,8 @@ class InitialSetup():
         if sanity is not True:
             self.logger.error(f"Sanity check failed: {sanity['error']}")
             exit(1)
+
+    def run(self):
         if not self.setup_overlayroot():
             self.logger.error('Error setting up overlayroot.')
             exit(1)
@@ -66,7 +68,6 @@ class InitialSetup():
             self.logger.info(rebrand_status['step'] + ' completed successfully.')
         self.logger.info('Initial setup completed successfully.\n Please reboot the system to apply the changes.')
         
-    
     def sanity_check(self):
         """
         Performs a sanity check on the system.

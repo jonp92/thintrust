@@ -3,7 +3,7 @@ import os
 import json
 from utils.logger import Logger
 import subprocess
-from utils.system_profiler import SystemProfiler
+
 from argparse import ArgumentParser
 
 class ThinTrust(Logger):
@@ -45,9 +45,27 @@ class ThinTrust(Logger):
         # if not self.install_initial_packages():
         #     self.logger.error(f'Error installing initial packages:{self.initial_packages}\n Try installing them manually and running ThinTrust again.')
         #     exit(1)
+        if not self.is_package_installed('python3-psutil'):
+            try:
+                if subprocess.call('apt-get install -y python3-psutil', shell=True) != 0:
+                    self.logger.error('Error installing python3-psutil. Try installing it manually and running ThinTrust again.')
+                    exit(1)
+            except Exception as e:
+                self.logger.error(f'Error installing python3-psutil: {e}')
+                exit(1)
+        from utils.system_profiler import SystemProfiler
         self.system_profiler = SystemProfiler(self.logger).system_profile
         from setup.setup_v2 import InitialSetup
-        self.initial_setup = InitialSetup
+        self.initial_setup = InitialSetup(self)
+    
+
+    def is_package_installed(self,package_name):
+        try:
+            output = subprocess.check_output(f"dpkg-query -s {package_name}", shell=True, stderr=subprocess.STDOUT)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
         
     def install_initial_packages(self):
         """
@@ -78,8 +96,9 @@ if __name__ == '__main__':
     if args.version:
         print(f'ThinTrust {thintrust.pretty_version}')
     elif args.setup:
+        # First, install the initial packages required by ThinTrust as some are required by initial setup. Then, run the initial setup.
         thintrust.install_initial_packages()
-        thintrust.initial_setup(thintrust)
+        thintrust.initial_setup.run()
     elif args.sysprofile:
         print(json.dumps(thintrust.system_profiler, indent=4))
     else:

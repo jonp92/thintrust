@@ -13,6 +13,7 @@ class InitialSetup(ThinTrust):
     Attributes:
         setup_config (dict): Configuration data for the setup.
         sevenzip (SevenZip): Instance of the SevenZip class for handling 7zip operations.
+        rebrand_status (dict): Status of the rebranding process.
 
     Methods:
         __init__(): Initializes the InitialSetup object.
@@ -56,6 +57,10 @@ class InitialSetup(ThinTrust):
         if rebrand_status['status'] != 'success':
             self.logger.error(f"Rebranding failed: {rebrand_status}")
             exit(1)
+        else:
+            self.logger.info(rebrand_status['step'] + ' completed successfully.')
+        self.logger.info('Initial setup completed successfully.\n Please reboot the system to apply the changes.')
+        
     
     def sanity_check(self):
         """
@@ -349,6 +354,17 @@ class InitialSetup(ThinTrust):
                 return False
         
         def ensure_user(self):
+            """
+            Ensures the user exists.
+            
+            This method checks if the user exists and creates it if it does not.
+            
+            Args:
+                None
+                
+            Returns:
+                bool: True if the user exists or is created successfully, False otherwise.
+            """
             try:
                 if subprocess.check_output('id user', shell=True):
                     return True
@@ -361,6 +377,18 @@ class InitialSetup(ThinTrust):
                 return False
             
         def set_default_background(self):
+            """
+            Sets the default background and theme.
+            
+            This method downloads the default wallpaper and sets it as the background.
+            It also sets the default theme for the user using an autostart script that runs at every login.
+            
+            Args:
+                None
+                
+            Returns:
+                bool: True if the background and theme are set successfully, False otherwise.
+            """
             import requests
             if not os.path.exists('/usr/share/wallpapers'):
                 os.makedirs('/usr/share/wallpapers')
@@ -392,6 +420,18 @@ class InitialSetup(ThinTrust):
                 return False
             
         def set_lightdm_theme(self):
+            """
+            Sets the lightdm theme.
+            
+            This method downloads the default wallpaper and sets it as the lightdm background.
+            It also sets the default theme and icons for the lightdm greeter.
+            
+            Args:
+                None
+                
+            Returns:
+                bool: True if the lightdm theme is set successfully, False otherwise.
+            """
             import requests
             try:
                 with open('/usr/share/wallpapers/wallpaper.png', 'wb') as f:
@@ -449,4 +489,15 @@ class InitialSetup(ThinTrust):
         return {'step': 'rebrand_os', 'status': 'success'}
 
 if __name__ == '__main__':
+    """
+    Main entry point for the initial setup script.
+    
+    This script performs the initial setup of the ThinTrust system.
+    
+    Args:
+        None
+        
+    Returns:
+        None
+    """
     InitialSetup()

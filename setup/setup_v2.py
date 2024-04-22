@@ -36,7 +36,7 @@ class InitialSetup():
             None
         """
         self.thintrust = thintrust_class
-        for key, value in dir(self.thintrust):
+        for key in dir(self.thintrust):
             if not key.startswith('__'):
                 setattr(self, key, getattr(self.thintrust, key))
         script_dir = os.path.dirname(os.path.abspath(__file__))

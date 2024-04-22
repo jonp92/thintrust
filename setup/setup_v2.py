@@ -42,7 +42,6 @@ class InitialSetup():
         script_dir = os.path.dirname(os.path.abspath(__file__))
         setup_file = f'{script_dir}/setup.json'
         self.logger.name = 'InitialSetup'
-        self.logger.info(f'Starting initial setup of ThinTrust GNU/Linux {self.distro_version} {self.distro_release.capitalize()}...')
         self.sevenzip = SevenZip()
         if os.path.exists(setup_file):
             with open(setup_file, 'r') as f:
@@ -56,6 +55,7 @@ class InitialSetup():
             exit(1)
 
     def run(self):
+        self.logger.info(f'Starting initial setup of ThinTrust GNU/Linux {self.distro_version} {self.distro_release.capitalize()}...')
         if not self.setup_overlayroot():
             self.logger.error('Error setting up overlayroot.')
             exit(1)

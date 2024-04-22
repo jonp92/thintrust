@@ -44,6 +44,8 @@ class ThinTrust(Logger):
             self.logger.error(f'Error installing initial packages:{self.initial_packages}\n Try installing them manually and running ThinTrust again.')
             exit(1)
         self.system_profiler = SystemProfiler(self.logger).system_profile
+        from setup.setup_v2 import InitialSetup
+        InitialSetup(self)
         
     def install_initial_packages(self):
         """
@@ -57,9 +59,6 @@ class ThinTrust(Logger):
         try:
             subprocess.check_output(f'apt-get update -y', shell=True)
             subprocess.check_output(f'apt-get install -y {" ".join(self.initial_packages)}', shell=True)
-            #subprocess.check_output('python3 -m venv .venv', shell=True)
-            #subprocess.check_output('pip3 install psutil --break-system-packages', shell=True)
-            #subprocess.check_output('.venv/bin/pip3 install -r requirements.txt', shell=True) 
             return True
         except Exception as e:
             self.logger.error(f'Error installing initial packages: {e}')

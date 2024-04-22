@@ -101,7 +101,7 @@ class InitialSetup(ThinTrust):
             None
 
         Returns:
-            None
+            bool: True if overlayroot is set up successfully, False otherwise.
         """
         self.logger.info('Setting up overlayroot...')
         try:
@@ -125,12 +125,12 @@ class InitialSetup(ThinTrust):
             None
 
         Returns:
-            None
+            bool: True if the hostname is set successfully, False otherwise.
         """
         self.logger.info('Setting hostname...')
         try:
             random_uuid = uuid.uuid4().hex[:6]
-            subprocess.check_output(f'hostnamectl set-hostname ThinTrust-{random_uuid}', shell=True)
+            subprocess.check_output(f'hostnamectl set-hostname thintrust-{random_uuid}', shell=True)
             self.logger.info('Hostname set successfully.')
             return True
         except Exception as e:
@@ -148,7 +148,7 @@ class InitialSetup(ThinTrust):
             None
 
         Returns:
-            None
+            dict: A dictionary containing the status of the rebranding process.
         """
         self.logger.info('Rebranding OS...')
         def install_rebrand_packages(self):

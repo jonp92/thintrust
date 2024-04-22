@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import subprocess
+import uuid
 
 from thintrust import ThinTrust
 from utils.sevenzip import SevenZip
@@ -53,6 +54,7 @@ class InitialSetup(ThinTrust):
         if not self.setup_overlayroot():
             self.logger.error('Error setting up overlayroot.')
             exit(1)
+        self.set_hostname()
         rebrand_status = self.rebrand_os()
         if rebrand_status['status'] != 'success':
             self.logger.error(f"Rebranding failed: {rebrand_status}")
@@ -111,6 +113,28 @@ class InitialSetup(ThinTrust):
             return True
         except Exception as e:
             self.logger.error(f'Error setting up overlayroot: {e}')
+            return False
+    
+    def set_hostname(self):
+        """
+        Sets the hostname of the system.
+
+        This method sets the hostname of the system to the ThinTrust branding.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        self.logger.info('Setting hostname...')
+        try:
+            random_uuid = uuid.uuid4().hex[:6]
+            subprocess.check_output(f'hostnamectl set-hostname ThinTrust-{random_uuid}', shell=True)
+            self.logger.info('Hostname set successfully.')
+            return True
+        except Exception as e:
+            self.logger.error(f'Error setting hostname: {e}')
             return False
             
     def rebrand_os(self):

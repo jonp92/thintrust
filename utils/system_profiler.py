@@ -14,6 +14,7 @@ class SystemProfiler:
         profile['bios'] = self.get_bios_info()
         profile['memory'] = self.get_system_memory()
         profile['disks'] = self.get_disks()
+        profile['ips'] = self.get_ips()
         return profile
         
     def get_bios_info(self):
@@ -84,3 +85,14 @@ class SystemProfiler:
         except Exception as e:
             self.logger.error(f'Error getting disk info: {e}')
             return None
+        
+    def get_ips(self):
+        ips = []
+        try:
+            for interface in psutil.net_if_addrs():
+                for address in psutil.net_if_addrs()[interface]:
+                    if address.family == socket.AF_INET:
+                        ips.append(address.address)
+        except Exception as e:
+            self.logger.error(f'Error getting IP addresses: {e}')
+        return ips

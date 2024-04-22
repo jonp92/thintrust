@@ -7,7 +7,7 @@ class SystemProfiler:
         self.system_profile = self.system_profile()
         
     def system_profile(self):
-        self.logger.info('Collecting system profile...')
+        self.logger.debug('Collecting system profile...')
         profile = {}
         profile['hostname'] = socket.gethostname()
         profile['cpu'] = self.get_cpu_info()

@@ -87,6 +87,7 @@ class SystemProfiler:
             return None
         
     def get_ips(self):
+        import psutil
         ips = []
         try:
             for interface in psutil.net_if_addrs():

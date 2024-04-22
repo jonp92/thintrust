@@ -36,11 +36,10 @@ class InitialSetup():
             None
         """
         self.thintrust = thintrust_class
-        for key, value in self.thintrust.config.items():
+        for key, value in self.thintrust.config.items:
             setattr(self, key, value)
         script_dir = os.path.dirname(os.path.abspath(__file__))
         setup_file = f'{script_dir}/setup.json'
-        self.logger = self.thintrust.logger
         self.logger.name = 'InitialSetup'
         self.logger.info(f'Starting initial setup of ThinTrust GNU/Linux {self.distro_version} {self.distro_release.capitalize()}...')
         self.sevenzip = SevenZip()

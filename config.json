@@ -2,6 +2,9 @@
     "log_level": "DEBUG",
     "log_file": "thintrust.log",
     "min_disk_space": 25,
+    "supported_cpus": [
+        "x86_64"
+    ],
     "distro_version": 1.0,
     "distro_release": "annapolis",
     "initial_packages": [

@@ -80,7 +80,7 @@ class InitialSetup():
         Returns:
             bool or dict: True if the sanity check passes, otherwise a dictionary with an error message.
         """
-        if self.system_profiler['cpu']['architecture'] not in self.setup_config['supported_cpus']:
+        if self.system_profiler['cpu']['architecture'] not in self['supported_cpus']:
             self.logger.error(f'Unsupported CPU architecture: {self.system_profiler["cpu"]["architecture"]}')
             return {'error': 'Unsupported CPU architecture'}
         else:

@@ -1,8 +1,5 @@
 {
     "rebrand_os_packages": [
         "sudo", "figlet", "p7zip", "cinnamon-desktop-environment", "plymouth", "plymouth-themes"
-    ],
-    "supported_cpus": [
-        "x86_64"
     ]
 }

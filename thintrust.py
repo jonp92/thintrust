@@ -84,12 +84,16 @@ class ThinTrust(Logger):
             self.logger.error(f'Error installing initial packages: {e}')
             return False
         
+    def run_agent(self):
+        pass
+        
 if __name__ == '__main__':
     parser = ArgumentParser()
     thintrust = ThinTrust()
     parser.add_argument('-v', '--version', action='store_true', help='Display the version of ThinTrust.')
     parser.add_argument('-s', '--setup', action='store_true', help='Run the initial setup for ThinTrust.')
     parser.add_argument('-p', '--sysprofile', action='store_true', help='Display the system profile.')
+    parser.add_argument('-a', '--agent', action='store_true', help='Run the ThinTrust agent. (If not running as a service)')
     parser.description = 'ThinTrust setup and management tool.'
     parser.epilog = 'ThinTrust is a tool for setting up and managing ThinTrust OS endpoints.\n'
     args = parser.parse_args()
@@ -104,6 +108,8 @@ if __name__ == '__main__':
             print('Skipping initial setup. Exiting...')
     elif args.sysprofile:
         print(json.dumps(thintrust.system_profiler, indent=4))
+    elif args.agent:
+        thintrust.run_agent()
     else:
         parser.print_help()
 

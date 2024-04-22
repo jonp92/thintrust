@@ -1,5 +1,5 @@
 {
     "rebrand_os_packages": [
-        "sudo", "figlet", "p7zip", "cinnamon-desktop-environment", "plymouth", "plymouth-themes"
+        "sudo", "figlet", "p7zip", "cinnamon-desktop-environment", "plymouth", "plymouth-themes", "mate-themes", "papirus-icon-theme"
     ]
 }

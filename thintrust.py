@@ -4,6 +4,7 @@ import json
 from utils.logger import Logger
 import subprocess
 from utils.system_profiler import SystemProfiler
+from argparse import ArgumentParser
 
 class ThinTrust(Logger):
     """
@@ -46,7 +47,7 @@ class ThinTrust(Logger):
             exit(1)
         self.system_profiler = SystemProfiler(self.logger).system_profile
         from setup.setup_v2 import InitialSetup
-        InitialSetup(self)
+        self.initial_setup = InitialSetup
         
     def install_initial_packages(self):
         """
@@ -64,4 +65,16 @@ class ThinTrust(Logger):
         except Exception as e:
             self.logger.error(f'Error installing initial packages: {e}')
             return False
+        
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    thintrust = ThinTrust()
+    parser.add_argument('-v', '--version', action='store_true', help='Display the version of ThinTrust.')
+    parser.add_argument('-s', '--setup', action='store_true', help='Run the initial setup for ThinTrust.')
+    args = parser.parse_args()
+    if args.version:
+        print(f'ThinTrust Release: {thintrust.distro_release} Version: {thintrust.distro_version}')
+    elif args.setup:
+        thintrust.initial_setup(thintrust)
+
         

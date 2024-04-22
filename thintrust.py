@@ -70,11 +70,15 @@ if __name__ == '__main__':
     thintrust = ThinTrust()
     parser.add_argument('-v', '--version', action='store_true', help='Display the version of ThinTrust.')
     parser.add_argument('-s', '--setup', action='store_true', help='Run the initial setup for ThinTrust.')
+    parser.description = 'ThinTrust setup and management tool.'
+    parser.epilog = 'ThinTrust is a tool for setting up and managing ThinTrust OS on endpoints.'
     args = parser.parse_args()
     if args.version:
         print(f'ThinTrust Release: {thintrust.distro_release} Version: {thintrust.distro_version}')
     elif args.setup:
         thintrust.install_initial_packages()
         thintrust.initial_setup(thintrust)
+    else:
+        parser.print_help()
 
         

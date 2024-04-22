@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 import json
 from utils.logger import Logger

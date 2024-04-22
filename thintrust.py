@@ -101,7 +101,7 @@ if __name__ == '__main__':
             thintrust.install_initial_packages()
             thintrust.initial_setup.run()
         else:
-            print('Invalid selection. Exiting...')
+            print('Skipping initial setup. Exiting...')
     elif args.sysprofile:
         print(json.dumps(thintrust.system_profiler, indent=4))
     else:

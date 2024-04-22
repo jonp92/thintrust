@@ -91,8 +91,8 @@ class InitialSetup():
         disk_sizes = [round(disk['size'] / (1024 ** 3)) for disk in self.system_profiler['disks']]
         self.logger.debug(f'Disk sizes: {disk_sizes}')
         if not any(size >= self.min_disk_space for size in disk_sizes):
-            self.logger.error('No 32GB disk found.')
-            return {'error': 'No 32GB disk found'}
+            self.logger.error('A minimum disk size of 32gb required.')
+            return {'error': 'Insufficient disk space'}
         return True
     
     def setup_overlayroot(self):

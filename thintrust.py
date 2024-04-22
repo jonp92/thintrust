@@ -71,6 +71,7 @@ if __name__ == '__main__':
     thintrust = ThinTrust()
     parser.add_argument('-v', '--version', action='store_true', help='Display the version of ThinTrust.')
     parser.add_argument('-s', '--setup', action='store_true', help='Run the initial setup for ThinTrust.')
+    parser.add_argument('-p', '--sysprofile', action='store_true', help='Display the system profile.')
     parser.description = 'ThinTrust setup and management tool.'
     parser.epilog = 'ThinTrust is a tool for setting up and managing ThinTrust OS endpoints.\n'
     args = parser.parse_args()
@@ -79,6 +80,8 @@ if __name__ == '__main__':
     elif args.setup:
         thintrust.install_initial_packages()
         thintrust.initial_setup(thintrust)
+    elif args.sysprofile:
+        print(json.dumps(thintrust.system_profiler, indent=4))
     else:
         parser.print_help()
 

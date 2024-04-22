@@ -36,7 +36,8 @@ class InitialSetup():
             None
         """
         self.thintrust = thintrust_class
-        for key, value in self.thintrust.config.items:
+        for key, value in self.thintrust.config.items():
+            print(key, value)
             setattr(self, key, value)
         script_dir = os.path.dirname(os.path.abspath(__file__))
         setup_file = f'{script_dir}/setup.json'

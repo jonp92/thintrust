@@ -408,12 +408,13 @@ class InitialSetup():
                 self.logger.error(f'Error creating user: {e}')
                 return False
             
-        def set_default_background(self):
+        def set_default_gui_theme(self):
             """
             Sets the default background and theme.
             
             This method downloads the default wallpaper and sets it as the background.
             It also sets the default theme for the user using an autostart script that runs at every login.
+            A configuration file called override_theme in the users home/.config/thintrust folder is also created to that can turn off this behavior.
             
             Args:
                 None
@@ -432,8 +433,10 @@ class InitialSetup():
                 os.chown('/usr/local/etc/default_theme.sh', 1000, 1000)
                 if not os.path.exists('/home/user/.config/autostart'):
                     os.makedirs('/home/user/.config/autostart')
+                    os.makedirs('/home/user/.config/thintrust')
                     os.chown('/home/user/.config/', 1000, 1000)
                     os.chown('/home/user/.config/autostart', 1000, 1000)
+                    os.chown('/home/user/.config/thintrust', 1000, 1000)
                 with open('/home/user/.config/autostart/set_theme.desktop', 'w') as f:
                     f.write('[Desktop Entry]\n'
                             'Type=Application\n'
@@ -445,6 +448,8 @@ class InitialSetup():
                             'StartupNotify=false\n'
                             'Terminal=false\n'
                             'Hidden=false\n')
+                with open('/home/user/.config/thintrust/override_theme', 'w') as f:
+                    f.write("override_theme=True")
                 return True
             except Exception as e:
                 self.logger.error(f'Error setting default background: {e}')
@@ -526,7 +531,7 @@ class InitialSetup():
             return {'step': 'ensure_user', 'status': 'failed'}
         else:
             self.logger.info('User created successfully.')
-        if not set_default_background(self):
+        if not set_default_gui_theme(self):
             self.logger.error('Error setting default background.')
             return {'step': 'set_default_background', 'status': 'failed'}
         else:

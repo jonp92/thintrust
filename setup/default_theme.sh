@@ -2,6 +2,14 @@
 
 # Autostart script to set the default theme and wallpaper
 
+# See if overwriting the default theme is enabled
+override_theme=$(awk -F'=' '/override_theme/{print ($2=="True")?"True":"False"}' ~/.config/thintrust/override_theme)
+
+# If the override_theme is set to False, exit
+if [ "$override_theme" == "False" ]; then
+    exit
+fi
+
 # Set the wallpaper
 gsettings set org.cinnamon.desktop.background picture-uri "file:///usr/share/wallpapers/wallpaper.svg"
 

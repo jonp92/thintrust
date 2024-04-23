@@ -155,6 +155,7 @@ class InitialSetup():
             dict: A dictionary containing the status of the rebranding process.
         """
         self.logger.info('Rebranding OS...')
+        
         def install_rebrand_packages(self):
             """
             Installs the rebrand packages.
@@ -169,9 +170,14 @@ class InitialSetup():
             """
             try:
                 packages = self.setup_config['rebrand_os_packages']
+                self.logger.info('Installing rebrand packages...')
                 self.logger.debug(f'Installing rebrand packages: {packages}')
-                subprocess.check_output(f'apt-get install -y {" ".join(packages)}', shell=True)
-                return True
+                process = subprocess.Popen(f'apt-get install -y {" ".join(packages)}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                for line in iter(process.stdout.readline, b''):
+                    self.logger.debug(line.decode().strip())
+                process.stdout.close()
+                process.wait()
+                return process.returncode == 0
             except Exception as e:
                 self.logger.error(f'Error installing rebrand packages: {e}')
                 return False
@@ -478,37 +484,58 @@ class InitialSetup():
             except Exception as e:
                 self.logger.error(f'Error setting lightdm theme: {e}')
                 return False
-            
+        
+        # Start rebranding process and return early if any step fails    
         if not install_rebrand_packages(self):
             self.logger.error('Error installing rebrand packages.')
             return {'step': 'install_rebrand_packages', 'status': 'failed'}
+        else:
+            self.logger.info('Rebrand packages installed successfully.')
         if not change_issue(self):
             self.logger.error('Error changing issue files.')
             return {'step': 'change_issue', 'status': 'failed'}
+        else:
+            self.logger.info('Issue files changed successfully.')
         if not change_os_release(self):
             self.logger.error('Error changing os-release file.')
             return {'step': 'change_os_release', 'status': 'failed'}
+        else:
+            self.logger.info('OS release file changed successfully.')
         if not change_lsb_release(self):
             self.logger.error('Error changing lsb-release file.')
             return {'step': 'change_lsb_release', 'status': 'failed'}
+        else:
+            self.logger.info('LSB release file changed successfully.')
         if not change_motd(self):
             self.logger.error('Error changing motd file.')
             return {'step': 'change_motd', 'status': 'failed'}
+        else:
+            self.logger.info('Motd file changed successfully.')
         if not change_splash(self):
             self.logger.error('Error changing splash screen.')
             return {'step': 'change_splash', 'status': 'failed'}
+        else:
+            self.logger.info('Splash screen changed successfully.')
         if not update_grub(self):
             self.logger.error('Error updating GRUB.')
             return {'step': 'update_grub', 'status': 'failed'}
+        else:
+            self.logger.info('GRUB updated successfully.')
         if not ensure_user(self):
             self.logger.error('Error creating user.')
             return {'step': 'ensure_user', 'status': 'failed'}
+        else:
+            self.logger.info('User created successfully.')
         if not set_default_background(self):
             self.logger.error('Error setting default background.')
             return {'step': 'set_default_background', 'status': 'failed'}
+        else:
+            self.logger.info('Default background/theme set successfully.')
         if not set_lightdm_theme(self):
             self.logger.error('Error setting lightdm theme.')
             return {'step': 'set_lightdm_theme', 'status': 'failed'}
+        else:
+            self.logger.info('Lightdm theme set successfully.')
         self.logger.info('Rebranding completed.')
         return {'step': 'rebrand_os', 'status': 'success'}
 

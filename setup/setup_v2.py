@@ -433,9 +433,10 @@ class InitialSetup():
                 os.chown('/usr/local/etc/default_theme.sh', 1000, 1000)
                 if not os.path.exists('/home/user/.config/autostart'):
                     os.makedirs('/home/user/.config/autostart')
-                    os.makedirs('/home/user/.config/thintrust')
                     os.chown('/home/user/.config/', 1000, 1000)
                     os.chown('/home/user/.config/autostart', 1000, 1000)
+                if not os.path.exists('/home/user/.config/thintrust'):
+                    os.makedirs('/home/user/.config/thintrust')
                     os.chown('/home/user/.config/thintrust', 1000, 1000)
                 with open('/home/user/.config/autostart/set_theme.desktop', 'w') as f:
                     f.write('[Desktop Entry]\n'

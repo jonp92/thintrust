@@ -1,2 +1,5 @@
 psutil
 requests
+FastAPI
+uvicorn
+sqlalchemy

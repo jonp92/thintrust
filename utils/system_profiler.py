@@ -1,6 +1,7 @@
 import subprocess
 import socket
 
+
 class SystemProfiler:
     def __init__(self, logger=None):
         self.logger = logger
@@ -15,6 +16,7 @@ class SystemProfiler:
         profile['memory'] = self.get_system_memory()
         profile['disks'] = self.get_disks()
         profile['ips'] = self.get_ips()
+        profile['mac'] = self.get_mac_address()
         return profile
         
     def get_bios_info(self):
@@ -97,3 +99,14 @@ class SystemProfiler:
         except Exception as e:
             self.logger.error(f'Error getting IP addresses: {e}')
         return ips
+    
+    def get_mac_address(self):
+        import psutil
+        try:
+            for interface in psutil.net_if_addrs():
+                for address in psutil.net_if_addrs()[interface]:
+                    if address.family == socket.AF_LINK and not address.address == '00:00:00:00:00:00' and interface.startswith(('eth', 'enp', 'eno', 'ens', 'en')):
+                        return address.address
+        except Exception as e:
+            self.logger.error(f'Error getting MAC address: {e}')
+            return None

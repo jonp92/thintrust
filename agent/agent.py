@@ -23,11 +23,12 @@ class settings(Base):
 
 class ThinAgent(Logger):
     def __init__(self):
-        super().__init__(self.__class__.__name__, 'thinagent.log', 'DEBUG')
+        super().__init__(self.__class__.__name__, 'thinagent.log', 'INFO')
         self.engine = create_engine('sqlite:///thinagent.db')
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
+        self.last_seen = 0
         if 'agent_id' not in self.settings:
             agent_id = uuid.uuid4().hex
             self.new_setting('agent_id', agent_id)
@@ -82,57 +83,103 @@ class ThinAgent(Logger):
         profiler = SystemProfiler(logger=self.logger)
         system_info = profiler.system_profile
         return system_info
+      
+    async def route(self, data):
+        self.logger.debug(f'Routing: {data}')
+        if 'message' in data and data['message'] == 'OK':
+            await self.send({'message': 'OK'})
+        if 'message' in data and data['message'] == 'client_id?':
+            await self.send({'client_id': self.agent_id})
+        elif 'message' in data and data['message'] == 'system_info?':
+            try:
+                system_info = self.get_system_info()
+                await self.send(system_info)
+            except Exception as e:
+                self.logger.error(f'Error getting system info: {e}')
+        elif 'message' in data and data['message'] == 'settings':
+            await self.send(self.settings)
+        elif 'message' in data and data['message'] == 'update_setting':
+            if 'key' in data and 'value' in data:
+                self.update_setting(data['key'], data['value'])
+                await self.send({'message': 'Setting updated.'})
+            else:
+                await self.send({'message': 'Invalid request.'})
+        elif 'message' in data and data['message'] == 'Connection closed':
+            await self.websocket.close()
+            self.websocket = None
+            return True
             
-    async def connect(self):
-        self.websocket = await websockets.connect('ws://localhost:8080/ws')
-            
-    async def send(self, data):
-        await self.websocket.send(data)
-    
-    async def receive(self):
-        return await self.websocket.recv()
-    
-    async def main(self):
-        await self.connect()
+    async def websocket_handler(self, websocket):
+        self.websocket = websocket
         while True:
             try:
-                await self.send(f'get_client&id={self.agent_id}')
-                response = await asyncio.wait_for(self.receive(), timeout=1)
+                response = await asyncio.wait_for(self.receive(), 5)
+                try:
+                    response = json.loads(response)
+                except json.JSONDecodeError as e:
+                    self.logger.error(f'Error decoding response: {e}')
                 self.logger.debug(f'Received: {response}')
-                now = datetime.now().timestamp()
-                self.logger.debug(f'Now: {now}')
-                data = json.loads(response)
-                if 'last_seen' in data:
-                    self.last_seen = data['last_seen']
-                    self.logger.debug(f'Client last seen: {self.last_seen}')
-                if now - self.last_seen > 60:
-                    system_info = self.get_system_info()
-                    await self.send(f"update_client&id={self.agent_id}&data={json.dumps(system_info)}")
-                    self.logger.debug(f'Client updated: {system_info}')
-                elif now - self.last_seen < 60:
-                    self.logger.debug('Client is up to date.')
-                    continue
-            except json.JSONDecodeError:
-                if response == 'Invalid request':
-                    self.logger.error('Invalid request')
-                elif response == 'Client not found':
-                    system_info = self.get_system_info()
-                    await self.send(f"add_client&id={self.agent_id}&data={json.dumps(system_info)}")
-                    self.logger.debug(f'Client added: {system_info}')
+                stop = await self.route(response)
+                if stop:
+                    break
+            except websockets.exceptions.ConnectionClosedError as e:
+                self.logger.error(f'Connection closed: {e}')
+                self.websocket = None
+                break
+            except websockets.exceptions.ConnectionClosedOK as e:
+                self.logger.error(f'Connection closed: {e}')
+                self.websocket = None
+                break
             except Exception as e:
-                self.logger.error(f'Error: {e}')
-            finally:
-                self.logger.debug('Next iteration in 30 seconds...')
-                await asyncio.sleep(30)
+                self.logger.error(f'Error handling websocket: {e}')
+                self.websocket = None
+                break
             
+                
+    async def send(self, data):
+        if type(data) == dict:
+            try:
+                data = json.dumps(data)
+            except Exception as e:
+                self.logger.error(f'Error converting data to json: {e}')
+            try:
+                await self.websocket.send(data)
+            except websockets.exceptions.ConnectionClosedError as e:
+                self.logger.error(f'Connection closed abnormally: {e}')
+            except websockets.exceptions.ConnectionClosedOK as e:
+                self.logger.error(f'Connection closed: {e}')
+            except Exception as e:
+                self.logger.error(f'Error sending data: {e}')
+        else:
+            self.logger.error('Data must be a dictionary.')
         
+    
+    async def receive(self):
+        try:
+            return await self.websocket.recv()
+        except websockets.exceptions.ConnectionClosedError as e:
+            return json.dumps({'message': 'Connection closed'})
+        except websockets.exceptions.ConnectionClosedOK as e:
+            return json.dumps({'message': 'Connection closed'})
+        except Exception as e:
+            return json.dumps({'message': f"Error receiving data. {e}"})
+    
+    async def main(self):
+        async with websockets.serve(self.websocket_handler, 'localhost', 8765):
+            await asyncio.Future()
+     
     @property
     def loop(self):
         return asyncio.get_event_loop()
 
         
-    
 if __name__ == '__main__':
     agent = ThinAgent()
-    agent.loop.run_until_complete(agent.main())
+    try:
+        agent.loop.run_until_complete(agent.main())
+    except KeyboardInterrupt:
+        agent.logger.info('Exiting...')
+        agent.loop.stop()
+        agent.loop.close()
+        exit(0)
     

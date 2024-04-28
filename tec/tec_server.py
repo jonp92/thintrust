@@ -1,4 +1,5 @@
 import json
+import asyncio
 import os
 import websockets
 from datetime import datetime
@@ -46,87 +47,55 @@ class TECServer(Logger):
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
-        self.api = FastAPI()
-        self.api.add_websocket_route('/ws', self.websocket_handler)
+        #self.api = FastAPI()
+        #self.api.add_websocket_route('/ws', self.websocket_handler)
+        self.websocket = None
         
-    async def websocket_handler(self, websocket: WebSocket):
-        await websocket.accept()
-        while True:
-            data = await websocket.receive_text()
-            async def route(data):
-                if data == 'get_clients':
-                    clients = self.session.query(thinclients).all()
-                    self.logger.debug(f'Clients were Requested, sending {len(clients)} clients.')
-                    for client in clients:
-                        await websocket.send_text(json.dumps(client.to_dict()))
-                elif 'get_client' in data:
-                    try:
-                        client_id = data.split('&')[1].split('=')[1] # get client id i.e get_client&id=1
-                        client = self.session.query(thinclients).filter_by(id=client_id).first()
-                        if client is None:
-                            await websocket.send_text('Client not found')
-                        else:
-                            self.logger.debug(f'Client was Requested: {client.id}')
-                            await websocket.send_text(json.dumps(client.to_dict()))
-                    except Exception as e:
-                        self.logger.error(f'Error getting client: {e}')
-                        await websocket.send_text('Invalid request')
-                elif 'update_client' in data:
-                    try:
-                        client_id = data.split('&')[1].split('=')[1] # get client id i.e update_client&id=1
-                        client = self.session.query(thinclients).filter_by(id=client_id).first()
-                        if client is None:
-                            await websocket.send_text('Client not found')
-                            return
-                        client_data = json.loads(data.split('&')[2].split('=')[1]) # get client data i.e update_client&id=1&data={"hostname": "test"}
-                        client_data['last_seen'] = datetime.now().timestamp() # update last_seen
-                        if client_data is None:
-                            await websocket.send_text('Invalid client data')
-                            return
-                        for key, value in client_data.items():
-                            setattr(client, key, value)
-                        self.session.commit()
-                        self.logger.debug(f'Client was Updated: {client} with data: {client_data}')
-                        await websocket.send_text('Client updated successfully')
-                    except Exception as e:
-                        self.logger.error(f'Error updating client: {e}')
-                        await websocket.send_text('Invalid request')
-                elif 'add_client' in data:
-                    try:
-                        client_id = data.split('&')[1].split('=')[1] # get client id i.e add_client&id=1
-                        self.logger.debug(f'Client ID: {client_id}')
-                        if not client_id:
-                            await websocket.send_text('Invalid client id')
-                            return
-                        client_data = json.loads(data.split('&')[2].split('=')[1]) # get client data i.e add_client&id=1&data={"hostname": "test"}
-                        client_data['last_seen'] = datetime.now().timestamp() # update last_seen
-                        self.logger.debug(f'Client Data: {client_data}')
-                        if client_data is None:
-                            await websocket.send_text('Invalid client data')
-                            return
-                        client = thinclients(id=client_id, **client_data)
-                        self.session.add(client)
-                        self.session.commit()
-                        self.logger.debug(f'Client was Added: {client} with data: {client_data}')
-                        await websocket.send_text('Client added successfully')
-                    except Exception as e:
-                        self.logger.error(f'Error adding client: {e}')
-                        await websocket.send_text('Invalid request')
-                else:
-                    self.logger.debug(f'Invalid request: {data}')
-                    await websocket.send_text('Invalid request')
-
-            await route(data)
+    async def connect_to_client(self, protocol, client_ip, client_port):
+        self.logger.info(f'Connecting to client @ {protocol}://{client_ip}:{client_port}')
+        uri = f'{protocol}://{client_ip}:{client_port}'
+        self.websocket = await websockets.connect(uri)
+        
+    async def send_data(self, data):
+        await self.websocket.send(data)
+    
+    async def receive_data(self):
+        return await self.websocket.recv()
+    
+    async def poll_client(self, protocol, ip, port):
+        await self.connect_to_client(protocol, ip, port)
+        await self.send_data(json.dumps({'message': 'client_id?'}))
+        client_id = json.loads(await self.receive_data())['client_id']
+        self.logger.debug(f"Client ID: {client_id}")
+        await self.send_data(json.dumps({'message': 'OK'}))
+        response = await self.receive_data()
+        if json.loads(response) == {'message': 'OK'}:
+            await self.send_data(json.dumps({'message': 'system_info?'}))
+            response = await self.receive_data()
+            self.logger.debug(f'System Info: {response}')
+            system_info = json.loads(response)
+            system_info['last_seen'] = datetime.now().timestamp()
+            if self.session.query(thinclients).filter_by(id=client_id).first():
+                self.session.query(thinclients).filter_by(id=client_id).update(system_info)
+                self.session.commit()
+                self.logger.info(f'System info updated in database for client {client_id}')
+            else:
+                self.session.add(thinclients(id=client_id, **system_info))
+                self.session.commit()
+                self.logger.info(f"System info saved to database for client {client_id}")
+            
+        else:
+            self.logger.error('Error connecting to client.')
+        self.logger.info('Closing connection...')
+        await self.send_data(json.dumps({'message': 'Connection closed.'}))
+        await self.websocket.close()
+        await self.websocket.wait_closed()
+        self.logger.info('Connection closed.')
+                
             
     def run(self):
-        '''
-        run is a method that runs the API application.
-        
-        This method runs the API application using the uvicorn module. The host and port are specified in the config.json file.
-        '''
-        import uvicorn
-        uvicorn.run(self.api, host=self.config['host'], port=int(self.config['port']))
-        
+        asyncio.run(self.poll_client('ws', '127.0.0.1', '8765'))
+    
 if __name__ == '__main__':
     server = TECServer()
     server.run()

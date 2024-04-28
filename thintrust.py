@@ -10,16 +10,21 @@ class ThinTrust(Logger):
     """
     The ThinTrust class represents the main functionality of the ThinTrust application.
 
-    It initializes the ThinTrust application, checks for root privileges, loads the configuration file,
-    installs initial packages, and sets up the system profiler.
+    It is responsible for initializing the application, installing the initial packages, running the ThinTrust agent and server,
+    and running the initial setup for ThinTrust. In essence, it manages all functionality of the ThinTrust application suite.
 
     Attributes:
         config (dict): The configuration loaded from the config.json file.
         system_profiler (SystemProfiler): An instance of the SystemProfiler class.
+        pretty_version (str): A human-readable version of the OS version.
 
     Methods:
         __init__(): Initializes the ThinTrust application.
         install_initial_packages(): Installs the initial packages required by ThinTrust.
+        is_package_installed(package_name): Checks if a package is installed.
+        run_agent(): Runs the ThinTrust agent.
+        run_server(): Runs the ThinTrust server.
+        run_initial_setup(): Runs the initial setup for ThinTrust.
 
     """
 
@@ -45,20 +50,8 @@ class ThinTrust(Logger):
         # if not self.install_initial_packages():
         #     self.logger.error(f'Error installing initial packages:{self.initial_packages}\n Try installing them manually and running ThinTrust again.')
         #     exit(1)
-        if not self.is_package_installed('python3-psutil'):
-            try:
-                if subprocess.call('apt-get install -y python3-psutil', shell=True) != 0:
-                    self.logger.error('Error installing python3-psutil. Try installing it manually and running ThinTrust again.')
-                    exit(1)
-            except Exception as e:
-                self.logger.error(f'Error installing python3-psutil: {e}')
-                exit(1)
-        from utils.system_profiler import SystemProfiler
-        self.system_profiler = SystemProfiler(self.logger).system_profile
-        from setup.setup_v2 import InitialSetup
-        self.initial_setup = InitialSetup(self)
-    
-
+        
+        
     def is_package_installed(self,package_name):
         try:
             output = subprocess.check_output(f"dpkg-query -s {package_name}", shell=True, stderr=subprocess.STDOUT)
@@ -85,28 +78,55 @@ class ThinTrust(Logger):
             return False
         
     def run_agent(self):
-        pass
+        from agent.agent import ThinAgent
+        agent = ThinAgent()
+        agent.loop.run_until_complete(agent.connect())
+        
+    def run_server(self):
+        from tec.tec_server import TECServer
+        server = TECServer()
+        server.run()
+        
+    def run_initial_setup(self):
+        self.install_initial_packages()
+        from setup.setup_v2 import InitialSetup
+        self.initial_setup = InitialSetup(self)
+        self.initial_setup.run()
         
 if __name__ == '__main__':
     parser = ArgumentParser()
     thintrust = ThinTrust()
     parser.add_argument('-v', '--version', action='store_true', help='Display the version of ThinTrust.')
-    parser.add_argument('-s', '--setup', action='store_true', help='Run the initial setup for ThinTrust.')
+    parser.add_argument('-i', '--install', action='store_true', help='Run the initial install for ThinTrust.')
     parser.add_argument('-p', '--sysprofile', action='store_true', help='Display the system profile.')
     parser.add_argument('-a', '--agent', action='store_true', help='Run the ThinTrust agent. (If not running as a service)')
+    parser.add_argument('-s', '--server', action='store_true', help='Run the ThinTrust server.')
     parser.description = 'ThinTrust setup and management tool.'
     parser.epilog = 'ThinTrust is a tool for setting up and managing ThinTrust OS endpoints.\n'
     args = parser.parse_args()
     if args.version:
         print(f'ThinTrust {thintrust.pretty_version}')
-    elif args.setup:
-        # First, install the initial packages required by ThinTrust as some are required by initial setup. Then, run the initial setup.
-        thintrust.install_initial_packages()
-        thintrust.initial_setup.run()
+    elif args.install:
+        thintrust.run_initial_setup()
     elif args.sysprofile:
-        print(json.dumps(thintrust.system_profiler, indent=4))
+        from utils.system_profiler import SystemProfiler
+        try:
+            import psutil
+        except ImportError:
+            if not thintrust.is_package_installed('python3-psutil'):
+                try:
+                    if subprocess.call('apt-get install -y python3-psutil', shell=True) != 0:
+                        thintrust.logger.error('Error installing python3-psutil. Try installing it manually and running ThinTrust again.')
+                        exit(1)
+                except Exception as e:
+                    thintrust.logger.error(f'Error installing python3-psutil: {e}')
+                    exit(1)
+        sp = SystemProfiler(logger=thintrust.logger)
+        print(json.dumps(sp.system_profile, indent=4))
     elif args.agent:
         thintrust.run_agent()
+    elif args.server:
+        thintrust.run_server()
     else:
         parser.print_help()
 
